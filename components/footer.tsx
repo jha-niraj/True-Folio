@@ -1,108 +1,124 @@
 "use client"
 
 import Link from "next/link"
-import { motion } from "framer-motion"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import {
-    Code, Sparkles, Github, Twitter, Linkedin, Mail, ArrowRight, Heart,
-    Globe, Shield, Zap, Users, BookOpen, HelpCircle, FileText, ExternalLink
-} from "lucide-react"
+import { Code, Github, Twitter, Linkedin } from "lucide-react"
 
 const footerSections = [
     {
-        title: "Platform",
+        title: "Pages",
         links: [
-            { href: "/", label: "Home", icon: Globe },
-            { href: "/input", label: "Build Portfolio", icon: Code },
-            { href: "/portfolio/demo-user", label: "Demo", icon: Users },
+            { href: "/", label: "Home" },
+            { href: "/input", label: "Build Portfolio" },
+            { href: "/portfolio/demo-user", label: "Demo" },
+            { href: "/pricing", label: "Pricing" },
         ],
     },
     {
-        title: "Company",
+        title: "Socials",
         links: [
-            { href: "/about", label: "About", icon: Users },
-            { href: "/privacy", label: "Privacy", icon: Shield },
-            { href: "/contact", label: "Contact", icon: Mail },
+            { href: "https://twitter.com", label: "X" },
+            { href: "https://linkedin.com", label: "LinkedIn" },
+            { href: "https://github.com", label: "GitHub" },
+        ],
+    },
+    {
+        title: "Extensions",
+        links: [
+            { href: "/vscode", label: "Vs Code" },
+            { href: "/neovim", label: "NeoVim (soon)" },
+        ],
+    },
+    {
+        title: "Legal",
+        links: [
+            { href: "/terms", label: "Terms of services" },
+            { href: "/privacy", label: "Privacy policy" },
         ],
     },
 ]
 
 const socialLinks = [
-    { href: "https://github.com", icon: Github, label: "GitHub", color: "hover:text-gray-300" },
-    { href: "https://twitter.com", icon: Twitter, label: "Twitter", color: "hover:text-gray-300" },
-    { href: "https://linkedin.com", icon: Linkedin, label: "LinkedIn", color: "hover:text-gray-300" },
-]
-
-const features = [
-    { icon: Zap, text: "AI-Powered Insights" },
-    { icon: Shield, text: "Verified Achievements" },
-    { icon: Users, text: "15K+ Students" },
-    { icon: Globe, text: "Global Community" },
+    { href: "https://github.com", icon: Github, label: "GitHub" },
+    { href: "https://twitter.com", icon: Twitter, label: "Twitter" },
+    { href: "https://linkedin.com", icon: Linkedin, label: "LinkedIn" },
 ]
 
 export function Footer() {
     return (
-        <footer className="bg-black text-white">
-            <div className="max-w-7xl mx-auto px-6 py-12">
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                    <div className="lg:col-span-4">
-                        <Link href="/" className="flex items-center gap-3 mb-6">
-                            <div className="relative">
-                                <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center">
-                                    <Code className="h-6 w-6 text-black" />
+        <footer className="bg-gray-900 text-white relative overflow-hidden">
+            {/* Large Background Text */}
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <div className="text-[12rem] md:text-[16rem] lg:text-[20rem] font-bold text-gray-800/20 select-none">
+                    TrueFolio
+                </div>
+            </div>
+
+            <div className="relative z-10">
+                <div className="max-w-7xl mx-auto px-6 py-16">
+                    <div className="grid grid-cols-1 lg:grid-cols-5 gap-12">
+                        {/* Brand Section */}
+                        <div className="lg:col-span-1">
+                            <Link href="/" className="flex items-center gap-3 mb-6">
+                                <Code className="h-6 w-6 text-white" />
+                                <div>
+                                    <h2 className="text-lg font-medium text-white">TrueFolio</h2>
+                                    <p className="text-sm text-gray-400">The Coder'z</p>
                                 </div>
+                            </Link>
+                            <p className="text-sm text-gray-400 mb-6 max-w-xs">Code with superpowers TrueFolio</p>
+                            <div className="flex gap-4">
+                                {socialLinks.map((social) => (
+                                    <Link
+                                        key={social.href}
+                                        href={social.href}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-gray-400 hover:text-white transition-colors duration-200"
+                                    >
+                                        <social.icon className="h-5 w-5" />
+                                    </Link>
+                                ))}
                             </div>
-                            <div>
-                                <h2 className="text-xl font-bold text-white">TrueFolio</h2>
-                                <p className="text-sm text-gray-400">Build. Verify. Succeed.</p>
-                            </div>
-                        </Link>
-                        <div className="flex gap-4 mb-6">
-                            {socialLinks.map((social) => (
-                                <Link
-                                    key={social.href}
-                                    href={social.href}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className={`text-gray-400 ${social.color}`}
-                                >
-                                    <social.icon className="h-5 w-5" />
-                                </Link>
-                            ))}
                         </div>
-                    </div>
-                    <div className="lg:col-span-8">
-                        <div className="grid grid-cols-2 gap-8">
-                            {footerSections.map((section) => (
-                                <div key={section.title}>
-                                    <h3 className="text-sm font-semibold mb-4">{section.title}</h3>
-                                    <ul className="space-y-3">
-                                        {section.links.map((link) => (
-                                            <li key={link.href}>
-                                                <Link
-                                                    href={link.href}
-                                                    className="text-gray-400 hover:text-white text-sm flex items-center gap-2"
-                                                >
-                                                    <link.icon className="h-4 w-4" />
-                                                    {link.label}
-                                                </Link>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            ))}
+
+                        {/* Footer Links */}
+                        <div className="lg:col-span-4">
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+                                {footerSections.map((section) => (
+                                    <div key={section.title}>
+                                        <h3 className="text-sm font-medium text-white mb-4">{section.title}</h3>
+                                        <ul className="space-y-3">
+                                            {section.links.map((link) => (
+                                                <li key={link.href}>
+                                                    <Link
+                                                        href={link.href}
+                                                        className="text-sm text-gray-400 hover:text-white transition-colors duration-200"
+                                                    >
+                                                        {link.label}
+                                                    </Link>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div className="border-t border-gray-800">
-                <div className="max-w-7xl mx-auto px-6 py-4">
-                    <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-                        <p className="text-sm text-gray-400">© 2025 TrueFolio. All rights reserved(The Coder&apos;z).</p>
-                        <div className="flex items-center gap-6 text-sm text-gray-400">
-                            <Link href="/privacy" className="hover:text-white">Privacy</Link>
-                            <Link href="/terms" className="hover:text-white">Terms</Link>
+
+                {/* Bottom Section */}
+                <div className="border-t border-gray-800">
+                    <div className="max-w-7xl mx-auto px-6 py-6">
+                        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+                            <p className="text-sm text-gray-400">© 2025 TrueFolio. All rights reserved (The Coder&apos;z).</p>
+                            <div className="flex items-center gap-6 text-sm text-gray-400">
+                                <Link href="/privacy" className="hover:text-white transition-colors duration-200">
+                                    Privacy
+                                </Link>
+                                <Link href="/terms" className="hover:text-white transition-colors duration-200">
+                                    Terms
+                                </Link>
+                            </div>
                         </div>
                     </div>
                 </div>
