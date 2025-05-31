@@ -14,6 +14,7 @@ import {
 import { cn } from "@/lib/utils"
 import { useTheme } from "next-themes"
 import Image from "next/image"
+import { SignUpButton, UserButton, useUser } from "@clerk/nextjs"
 
 const navigationLinks = [
     { href: "/", label: "Home", icon: Home },
@@ -34,6 +35,7 @@ export function Navbar() {
     const [scrolled, setScrolled] = useState(false)
     const { theme, setTheme } = useTheme()
     const [mounted, setMounted] = useState(false)
+    const { user, isLoaded } = useUser();
 
     useEffect(() => {
         setMounted(true)
@@ -142,12 +144,16 @@ export function Navbar() {
                                 <Sparkles className="h-4 w-4 mr-1.5" />
                                 AI Verified
                             </Badge>
-                            <Link href="/input">
-                                <Button className="bg-gradient-to-r from-teal-400 to-emerald-400 text-white hover:from-teal-500 hover:to-emerald-500 shadow-md hover:shadow-lg transition-all duration-300">
+                            {!isLoaded ? null : !user ? (
+                                <SignUpButton mode="modal" forceRedirectUrl="/details">
+                                    <Button className="cursor-pointer bg-gradient-to-r from-teal-400 to-emerald-400 text-white hover:from-teal-500 hover:to-emerald-500 shadow-md hover:shadow-lg transition-all duration-300">
                                     Get Started
                                     <ArrowRight className="ml-2 h-4 w-4" />
                                 </Button>
-                            </Link>
+                                </SignUpButton>
+                            ) : (
+                                <UserButton afterSignOutUrl="/" />
+                            )}
                         </div>
                         <Sheet open={isOpen} onOpenChange={setIsOpen}>
                             <SheetTrigger asChild>
@@ -204,12 +210,18 @@ export function Navbar() {
                                                 <Sparkles className="h-3 w-3 mr-1" />
                                                 AI Verified Platform
                                             </Badge>
-                                            <Link href="/input" onClick={() => setIsOpen(false)}>
+                                            {!isLoaded ? null : !user ? (
+                                                <SignUpButton mode="modal" forceRedirectUrl="/details">
                                                 <Button className="w-full bg-white text-black hover:bg-gray-100">
                                                     Get Started Free
                                                     <ArrowRight className="ml-2 h-4 w-4" />
                                                 </Button>
-                                            </Link>
+                                                </SignUpButton>
+                                            ) : (
+                                                <div className="flex justify-center">
+                                                    <UserButton afterSignOutUrl="/" />
+                                                </div>
+                                            )}
                                         </div>
                                         <div className="mt-8">
                                             <h3 className="text-sm font-medium text-gray-900 mb-4">Connect With Us</h3>

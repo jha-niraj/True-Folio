@@ -5,16 +5,19 @@ import Link from "next/link"
 import { motion } from "framer-motion"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import {
-	Database, Brain, Shield, Bell,
-	ArrowRight, CheckCircle, Users, TrendingUp, Briefcase, GraduationCap,
-	Code, BookOpen, Star, Zap, Building2, Award, Rocket, Globe, ExternalLink
+	ArrowRight, CheckCircle, Users, TrendingUp, GraduationCap,
+	Code, BookOpen, Star, Rocket
 } from "lucide-react"
 import SmoothScroll from "@/components/smoothscroll"
 import { WaitlistDialog } from "@/components/waitlist-dialog"
 import { Spotlight } from "@/components/ui/spotlight-new"
-import { SignInButton, SignUpButton } from "@clerk/nextjs"
+import { SignInButton, SignUpButton, useUser } from "@clerk/nextjs"
+import CareerOpportunitiesSection from "@/components/(landingpage)/career-opportunities"
+import EmployerSection from "@/components/(landingpage)/employer-section"
+import FeaturesSection from "@/components/(landingpage)/feature-section"
+import TestimonialsSection from "@/components/(landingpage)/testimonials-section"
+import CTASection from "@/components/(landingpage)/cta-section"
 
 function CustomSwitch({ value, onValueChange }: { value: boolean; onValueChange: (value: boolean) => void }) {
 	return (
@@ -74,54 +77,9 @@ const employerContent = {
 	],
 }
 
-const features = [
-	{
-		icon: Database,
-		title: "Real-Time Data Sync",
-		description:
-			"Automatically sync your latest projects, commits, and achievements from GitHub, LeetCode, and other platforms.",
-		color: "from-blue-500 to-blue-600",
-	},
-	{
-		icon: Brain,
-		title: "AI-Powered Insights",
-		description:
-			"Get intelligent analysis of your coding patterns, skill progression, and personalized recommendations.",
-		color: "from-purple-500 to-purple-600",
-	},
-	{
-		icon: Shield,
-		title: "Verified Achievements",
-		description:
-			"Earn credible verification badges that employers trust, backed by real data from your coding platforms.",
-		color: "from-green-500 to-green-600",
-	},
-	{
-		icon: Bell,
-		title: "Smart Job Matching",
-		description:
-			"Receive instant notifications when opportunities perfectly match your verified skills and experience level.",
-		color: "from-orange-500 to-orange-600",
-	},
-]
-
-const testimonials = [
-	{
-		text: "This platform transformed my job search. The AI insights helped me understand my strengths and landed me a senior role at a top tech company within 3 weeks!",
-		author: "Sarah Chen",
-		role: "Senior Software Engineer at Google",
-		avatar: "SC",
-	},
-	{
-		text: "We've hired 50+ developers through this platform. The verified portfolios save us countless hours in technical screening. It's a game-changer for recruitment.",
-		author: "Mike Rodriguez",
-		role: "Head of Engineering at Stripe",
-		avatar: "MR",
-	},
-]
-
 export default function LandingPage() {
 	const [isEmployer, setIsEmployer] = useState(false)
+	const { user, isLoaded } = useUser();
 	const currentContent = isEmployer ? employerContent : studentContent
 
 	return (
@@ -129,7 +87,7 @@ export default function LandingPage() {
 			<div className="w-full">
 				<section className="relative min-h-screen bg-white dark:bg-black overflow-hidden flex items-center">
 					<Spotlight />
-					
+
 					<div className="relative z-10 w-full pt-16">
 						<div className="max-w-7xl mx-auto px-6">
 							<div className="text-center space-y-2">
@@ -139,7 +97,7 @@ export default function LandingPage() {
 										animate={{ opacity: 1, y: 0 }}
 										transition={{ delay: 0.2 }}
 									>
-										<Badge 
+										<Badge
 											className="px-4 py-2 bg-gradient-to-r from-teal-500/10 to-emerald-500/10 backdrop-blur-sm border-teal-500/20"
 										>
 											<Star className="h-4 w-4 mr-2 text-teal-500" />
@@ -206,23 +164,37 @@ export default function LandingPage() {
 										animate={{ opacity: 1, y: 0 }}
 										transition={{ delay: 0.5 }}
 									>
-										<SignUpButton mode="modal" forceRedirectUrl="/details">
-											<Button className="relative group px-8 py-3 rounded-xl overflow-hidden bg-gradient-to-r from-teal-500 to-emerald-500 text-white shadow-lg hover:shadow-xl transition-all duration-300">
-												<div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
-												<span className="relative">
-													Transform Your Portfolio
-													<ArrowRight className="inline-block ml-2 h-5 w-5" />
-												</span>
-											</Button>
-										</SignUpButton>
-										<SignInButton mode="modal" forceRedirectUrl="/details">
-											<Button
-												variant="outline"
-												className="px-8 py-3 rounded-xl border-2 border-teal-500/50 text-teal-600 dark:text-teal-400 hover:bg-teal-50 dark:hover:bg-teal-500/10 transition-all duration-300"
-											>
-												Sign In
-											</Button>
-										</SignInButton>
+										{!user ? (
+											<>
+												<SignUpButton mode="modal" forceRedirectUrl="/details">
+													<Button className="cursor-pointer relative group px-8 py-3 rounded-xl overflow-hidden bg-gradient-to-r from-teal-500 to-emerald-500 text-white shadow-lg hover:shadow-xl transition-all duration-300">
+														<div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
+														<span className="relative">
+															Transform Your Portfolio
+															<ArrowRight className="inline-block ml-2 h-5 w-5" />
+														</span>
+													</Button>
+												</SignUpButton>
+												<SignInButton mode="modal" forceRedirectUrl="/details">
+													<Button
+														variant="outline"
+														className="cursor-pointer px-8 py-3 rounded-xl border-2 border-teal-500/50 text-teal-600 dark:text-teal-400 hover:bg-teal-50 dark:hover:bg-teal-500/10 transition-all duration-300"
+													>
+														Sign In
+													</Button>
+												</SignInButton>
+											</>
+										) : (
+											<Link href="/details">
+												<Button className="cursor-pointer relative group px-8 py-3 rounded-xl overflow-hidden bg-gradient-to-r from-teal-500 to-emerald-500 text-white shadow-lg hover:shadow-xl transition-all duration-300">
+													<div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
+													<span className="relative">
+														Continue Building Portfolio
+														<ArrowRight className="inline-block ml-2 h-5 w-5" />
+													</span>
+												</Button>
+											</Link>
+										)}
 									</motion.div>
 
 									<motion.div
@@ -346,134 +318,172 @@ export default function LandingPage() {
 					</div>
 				</section>
 
-				{!isEmployer && (
+				<CareerOpportunitiesSection isEmployer={isEmployer} />
+				<EmployerSection isEmployer={isEmployer} />
+				<FeaturesSection />
+				<TestimonialsSection />
+				<CTASection SignUpButton={SignUpButton} />
+
+				{/* {!isEmployer && (
 					<>
-						<section className="py-20 bg-white dark:bg-black">
-							<div className="max-w-7xl mx-auto px-6">
+						<section className="py-24 bg-white dark:bg-black relative overflow-hidden">
+							<div className="absolute inset-0 bg-gradient-to-br from-blue-50/30 to-purple-50/30 dark:from-blue-900/10 dark:to-purple-900/10" />
+							<div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fillRule='evenodd'%3E%3Cg fill='%234338ca' fillOpacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-40 dark:opacity-20" />
+							<div className="max-w-7xl mx-auto px-6 relative z-10">
 								<motion.div
-									className="text-center mb-12"
+									className="text-center mb-16"
 									initial={{ opacity: 0, y: 30 }}
 									whileInView={{ opacity: 1, y: 0 }}
 									transition={{ duration: 0.8 }}
 									viewport={{ once: true }}
 								>
-									<h2 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent mb-4">
+									<Badge className="px-4 py-2 mb-4 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full">
+										<Briefcase className="h-4 w-4 mr-2 inline-block" />
+										Career Opportunities
+									</Badge>
+									<h2 className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 dark:from-blue-400 dark:via-indigo-400 dark:to-purple-400 bg-clip-text text-transparent mb-6">
 										Apply to Jobs Directly
 									</h2>
-									<p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+									<p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed">
 										Skip the endless job boards. Apply directly to companies through our platform with your verified
-										portfolio
+										portfolio and get noticed by top employers.
 									</p>
 								</motion.div>
-								<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+								<div className="grid grid-cols-1 md:grid-cols-3 gap-8">
 									<motion.div
 										initial={{ opacity: 0, y: 30 }}
 										whileInView={{ opacity: 1, y: 0 }}
 										transition={{ duration: 0.6 }}
 										viewport={{ once: true }}
+										className="group"
 									>
-										<Card className="text-center border-gray-200 dark:border-gray-700 dark:bg-gray-800 hover:shadow-lg transition-all duration-300 group">
-											<CardHeader>
-												<div className="p-3 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl w-fit mx-auto mb-3 group-hover:scale-110 transition-transform">
-													<Briefcase className="h-8 w-8 text-white" />
-												</div>
-												<CardTitle className="text-lg dark:text-white">Curated Opportunities</CardTitle>
-											</CardHeader>
-											<CardContent>
-												<CardDescription className="text-gray-600 dark:text-gray-300">
-													Access exclusive job openings from top tech companies looking for verified talent
-												</CardDescription>
-											</CardContent>
-										</Card>
+										<div className="relative h-full">
+											<div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-blue-600/5 dark:from-blue-500/10 dark:to-blue-600/10 rounded-2xl transform group-hover:scale-105 transition-transform duration-300" />
+											<Card className="h-full bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border-0 shadow-lg group-hover:shadow-xl transition-all duration-300">
+												<CardHeader>
+													<div className="p-4 bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl w-fit mx-auto mb-4 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+														<Briefcase className="h-8 w-8 text-white" />
+													</div>
+													<CardTitle className="text-xl text-center dark:text-white">Curated Opportunities</CardTitle>
+												</CardHeader>
+												<CardContent>
+													<CardDescription className="text-gray-600 dark:text-gray-300 text-center text-base leading-relaxed">
+														Access exclusive job openings from top tech companies looking for verified talent. Get matched with positions that align with your skills and career goals.
+													</CardDescription>
+												</CardContent>
+											</Card>
+										</div>
 									</motion.div>
 									<motion.div
 										initial={{ opacity: 0, y: 30 }}
 										whileInView={{ opacity: 1, y: 0 }}
 										transition={{ duration: 0.6, delay: 0.1 }}
 										viewport={{ once: true }}
+										className="group"
 									>
-										<Card className="text-center border-gray-200 dark:border-gray-700 dark:bg-gray-800 hover:shadow-lg transition-all duration-300 group">
-											<CardHeader>
-												<div className="p-3 bg-gradient-to-r from-green-500 to-green-600 rounded-xl w-fit mx-auto mb-3 group-hover:scale-110 transition-transform">
-													<Shield className="h-8 w-8 text-white" />
-												</div>
-												<CardTitle className="text-lg dark:text-white">Verified Applications</CardTitle>
-											</CardHeader>
-											<CardContent>
-												<CardDescription className="text-gray-600 dark:text-gray-300">
-													Your applications come with AI-verified skills and achievements that employers trust
-												</CardDescription>
-											</CardContent>
-										</Card>
+										<div className="relative h-full">
+											<div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-green-600/5 dark:from-green-500/10 dark:to-green-600/10 rounded-2xl transform group-hover:scale-105 transition-transform duration-300" />
+											<Card className="h-full bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border-0 shadow-lg group-hover:shadow-xl transition-all duration-300">
+												<CardHeader>
+													<div className="p-4 bg-gradient-to-r from-green-500 to-green-600 rounded-2xl w-fit mx-auto mb-4 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+														<Shield className="h-8 w-8 text-white" />
+													</div>
+													<CardTitle className="text-xl text-center dark:text-white">Verified Applications</CardTitle>
+												</CardHeader>
+												<CardContent>
+													<CardDescription className="text-gray-600 dark:text-gray-300 text-center text-base leading-relaxed">
+														Stand out with AI-verified skills and achievements that employers trust. Your portfolio becomes your competitive advantage in the job market.
+													</CardDescription>
+												</CardContent>
+											</Card>
+										</div>
 									</motion.div>
 									<motion.div
 										initial={{ opacity: 0, y: 30 }}
 										whileInView={{ opacity: 1, y: 0 }}
 										transition={{ duration: 0.6, delay: 0.2 }}
 										viewport={{ once: true }}
+										className="group"
 									>
-										<Card className="text-center border-gray-200 dark:border-gray-700 dark:bg-gray-800 hover:shadow-lg transition-all duration-300 group">
-											<CardHeader>
-												<div className="p-3 bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl w-fit mx-auto mb-3 group-hover:scale-110 transition-transform">
-													<TrendingUp className="h-8 w-8 text-white" />
-												</div>
-												<CardTitle className="text-lg dark:text-white">Higher Success Rate</CardTitle>
-											</CardHeader>
-											<CardContent>
-												<CardDescription className="text-gray-600 dark:text-gray-300">
-													3x higher interview rate compared to traditional job applications
-												</CardDescription>
-											</CardContent>
-										</Card>
+										<div className="relative h-full">
+											<div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-purple-600/5 dark:from-purple-500/10 dark:to-purple-600/10 rounded-2xl transform group-hover:scale-105 transition-transform duration-300" />
+											<Card className="h-full bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border-0 shadow-lg group-hover:shadow-xl transition-all duration-300">
+												<CardHeader>
+													<div className="p-4 bg-gradient-to-r from-purple-500 to-purple-600 rounded-2xl w-fit mx-auto mb-4 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+														<TrendingUp className="h-8 w-8 text-white" />
+													</div>
+													<CardTitle className="text-xl text-center dark:text-white">Higher Success Rate</CardTitle>
+												</CardHeader>
+												<CardContent>
+													<CardDescription className="text-gray-600 dark:text-gray-300 text-center text-base leading-relaxed">
+														Experience a 3x higher interview rate compared to traditional applications. Our platform helps you bypass the traditional hiring barriers.
+													</CardDescription>
+												</CardContent>
+											</Card>
+										</div>
 									</motion.div>
 								</div>
 							</div>
 						</section>
-						<section className="py-20 bg-gradient-to-br from-green-50 to-blue-50 dark:bg-black dark:bg-none">
-							<div className="max-w-7xl mx-auto px-6">
+
+						<section className="py-24 relative overflow-hidden">
+							<div className="absolute inset-0 bg-gradient-to-br from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20" />
+							<div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fillRule='evenodd'%3E%3Cg fill='%2322c55e' fillOpacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-40 dark:opacity-20" />
+							<div className="max-w-7xl mx-auto px-6 relative z-10">
 								<motion.div
-									className="text-center mb-12"
+									className="text-center mb-16"
 									initial={{ opacity: 0, y: 30 }}
 									whileInView={{ opacity: 1, y: 0 }}
 									transition={{ duration: 0.8 }}
 									viewport={{ once: true }}
 								>
-									<h2 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-green-600 to-blue-600 dark:from-green-400 dark:to-blue-400 bg-clip-text text-transparent mb-4">
+									<Badge className="px-4 py-2 mb-4 bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded-full">
+										<Star className="h-4 w-4 mr-2 inline-block" />
+										Success Stories
+									</Badge>
+									<h2 className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-green-600 via-teal-600 to-blue-600 dark:from-green-400 dark:via-teal-400 dark:to-blue-400 bg-clip-text text-transparent mb-6">
 										Student Success Stories
 									</h2>
-									<p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-										See how students transformed their careers with our platform
+									<p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed">
+										Join our community of successful developers who have transformed their careers through our platform
 									</p>
 								</motion.div>
-								<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-									{
-										[
-											{ name: "Alex", role: "SDE at Google", salary: "$180k", time: "3 weeks" },
-											{ name: "Priya", role: "Frontend at Meta", salary: "$165k", time: "2 months" },
-											{ name: "David", role: "Backend at Netflix", salary: "$170k", time: "1 month" },
-											{ name: "Sarah", role: "Full Stack at Stripe", salary: "$160k", time: "6 weeks" },
-										].map((story, index) => (
-											<motion.div
-												key={index}
-												initial={{ opacity: 0, y: 30 }}
-												whileInView={{ opacity: 1, y: 0 }}
-												transition={{ duration: 0.6, delay: index * 0.1 }}
-												viewport={{ once: true }}
-											>
-												<Card className="text-center border-gray-200 dark:border-gray-700 dark:bg-gray-800 hover:shadow-lg transition-shadow">
+								<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+									{[
+										{ name: "Alex", role: "SDE at Google", salary: "$180k", time: "3 weeks", color: "from-blue-500 to-indigo-500" },
+										{ name: "Priya", role: "Frontend at Meta", salary: "$165k", time: "2 months", color: "from-purple-500 to-pink-500" },
+										{ name: "David", role: "Backend at Netflix", salary: "$170k", time: "1 month", color: "from-red-500 to-orange-500" },
+										{ name: "Sarah", role: "Full Stack at Stripe", salary: "$160k", time: "6 weeks", color: "from-teal-500 to-green-500" },
+									].map((story, index) => (
+										<motion.div
+											key={index}
+											initial={{ opacity: 0, y: 30 }}
+											whileInView={{ opacity: 1, y: 0 }}
+											transition={{ duration: 0.6, delay: index * 0.1 }}
+											viewport={{ once: true }}
+											className="group"
+										>
+											<div className="relative">
+												<div className="absolute inset-0 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800/50 dark:to-gray-700/50 rounded-2xl transform group-hover:scale-105 transition-transform duration-300" />
+												<Card className="relative bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border-0 shadow-lg group-hover:shadow-xl transition-all duration-300">
 													<CardContent className="pt-6">
-														<div className="w-12 h-12 bg-gradient-to-r from-green-500 to-blue-500 rounded-full flex items-center justify-center text-white font-bold text-lg mx-auto mb-3">
+														<div className={`w-16 h-16 bg-gradient-to-r ${story.color} rounded-2xl flex items-center justify-center text-white font-bold text-2xl mx-auto mb-4 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
 															{story.name[0]}
 														</div>
-														<h3 className="font-bold mb-1">{story.name}</h3>
-														<p className="text-gray-600 dark:text-gray-300 mb-2 text-sm">{story.role}</p>
-														<p className="text-green-600 dark:text-green-400 font-bold mb-1">{story.salary}</p>
-														<p className="text-xs text-gray-500">Hired in {story.time}</p>
+														<h3 className="text-xl font-bold mb-2 dark:text-white">{story.name}</h3>
+														<p className="text-gray-600 dark:text-gray-300 mb-3 text-base">{story.role}</p>
+														<div className="bg-green-50 dark:bg-green-900/30 rounded-full py-2 px-4 mb-3">
+															<p className="text-green-600 dark:text-green-400 font-bold text-lg">{story.salary}</p>
+														</div>
+														<div className="flex items-center justify-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+															<Clock className="h-4 w-4" />
+															<p>Hired in {story.time}</p>
+														</div>
 													</CardContent>
 												</Card>
-											</motion.div>
-										))
-									}
+											</div>
+										</motion.div>
+									))}
 								</div>
 							</div>
 						</section>
@@ -668,15 +678,15 @@ export default function LandingPage() {
 							<p className="text-lg text-teal-100 mb-8 max-w-2xl mx-auto">
 								Join thousands of professionals who've accelerated their careers with AI-powered portfolios
 							</p>
-							<Link href="/input">
+							<SignUpButton mode="modal" forceRedirectUrl="/details">
 								<Button className="bg-white dark:bg-gray-900 text-teal-600 dark:text-teal-400 hover:bg-gray-100 dark:hover:bg-gray-800 px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
 									Start Building Now
 									<ArrowRight className="ml-2 h-5 w-5" />
 								</Button>
-							</Link>
+							</SignUpButton>
 						</motion.div>
 					</div>
-				</section>
+				</section> */}
 			</div>
 		</SmoothScroll>
 	)

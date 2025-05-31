@@ -42,9 +42,9 @@ export function WaitlistDialog() {
             }
         }}>
             <DialogTrigger asChild>
-                <Button 
-                    variant="outline" 
-                    className="bg-white/10 border-2 border-white text-white hover:bg-white hover:text-black dark:bg-white/5 dark:hover:bg-white/20 dark:hover:text-white transition-all duration-300"
+                <Button
+                    variant="outline"
+                    className="bg-white/10 border-2 cursor-pointer border-white text-white hover:bg-white hover:text-black dark:bg-white/5 dark:hover:bg-white/20 dark:hover:text-white transition-all duration-300"
                 >
                     Join Waitlist
                 </Button>
@@ -102,9 +102,11 @@ export function WaitlistDialog() {
                                         {...register("name")}
                                         className="border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-400"
                                     />
-                                    {errors.name && (
-                                        <p className="text-sm text-red-500 dark:text-red-400">{errors.name.message}</p>
-                                    )}
+                                    {
+                                        errors.name && (
+                                            <p className="text-sm text-red-500 dark:text-red-400">{errors.name.message}</p>
+                                        )
+                                    }
                                 </div>
                                 <div className="space-y-2">
                                     <Label htmlFor="email" className="text-gray-700 dark:text-gray-300">Email</Label>
@@ -115,23 +117,27 @@ export function WaitlistDialog() {
                                         {...register("email")}
                                         className="border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-400"
                                     />
-                                    {errors.email && (
-                                        <p className="text-sm text-red-500 dark:text-red-400">{errors.email.message}</p>
-                                    )}
+                                    {
+                                        errors.email && (
+                                            <p className="text-sm text-red-500 dark:text-red-400">{errors.email.message}</p>
+                                        )
+                                    }
                                 </div>
                                 <Button
                                     type="submit"
-                                    className="w-full bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 text-white dark:from-teal-400 dark:to-emerald-400 dark:hover:from-teal-500 dark:hover:to-emerald-500 transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50"
+                                    className="w-full cursor-pointer bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 text-white dark:from-teal-400 dark:to-emerald-400 dark:hover:from-teal-500 dark:hover:to-emerald-500 transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50"
                                     disabled={isSubmitting}
                                 >
-                                    {isSubmitting ? (
-                                        <>
-                                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                            Joining...
-                                        </>
-                                    ) : (
-                                        "Join Waitlist"
-                                    )}
+                                    {
+                                        isSubmitting ? (
+                                            <>
+                                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                                Joining...
+                                            </>
+                                        ) : (
+                                            "Join Waitlist"
+                                        )
+                                    }
                                 </Button>
                             </motion.form>
                         )
