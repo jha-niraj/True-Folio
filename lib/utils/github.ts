@@ -94,7 +94,7 @@ export async function fetchGithubData(username: string): Promise<Record<string, 
 				totalRepos: profile.public_repos,
 				totalCommits: detailedRepos.reduce((sum, repo) => sum + repo.commitsCount, 0),
 				primaryLanguages: detailedRepos.reduce((acc: Record<string, number>, repo) => {
-					repo.techStack.forEach(lang => {
+					repo.techStack.forEach((lang: string) => {
 						acc[lang] = (acc[lang] || 0) + 1;
 					});
 					return acc;

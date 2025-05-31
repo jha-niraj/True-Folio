@@ -155,17 +155,17 @@ export default function InputPage() {
 			if (selectedPlatform === 'github' || selectedPlatform === 'leetcode') {
 				const platformType = selectedPlatform === 'github' ? PlatformType.GITHUB : PlatformType.LEETCODE;
 				await savePlatformData(platformType, inputLink.trim());
-				
+
 				setUserData((prev) => ({
 					...prev,
-					[currentCategory]: [...prev[currentCategory], { 
-						platform: selectedPlatform, 
-						link: inputLink.trim() 
+					[currentCategory]: [...prev[currentCategory], {
+						platform: selectedPlatform,
+						link: inputLink.trim()
 					}]
 				}));
 				toast.success(`${selectedPlatform} profile connected successfully!`);
 			}
-			
+
 			setInputLink("");
 			setSelectedPlatform("");
 			setDialogOpen(false);
@@ -267,17 +267,19 @@ export default function InputPage() {
 														<button
 															key={option.value}
 															onClick={() => handlePlatformSelect(category.key, option.value)}
-															className={`flex items-center gap-2 p-3 rounded-lg border transition-all duration-300 ${isConnected
-																	? "bg-purple-50 dark:bg-purple-900/30 border-purple-200 dark:border-purple-700 text-purple-600 dark:text-purple-300"
-																	: "bg-white/50 dark:bg-gray-800/50 border-white/20 dark:border-gray-700/30 hover:border-purple-300 dark:hover:border-purple-700 hover:shadow-lg hover:shadow-purple-500/10"
+															className={`cursor-pointer flex items-center gap-2 p-3 rounded-lg border transition-all duration-300 ${isConnected
+																? "bg-purple-50 dark:bg-purple-900/30 border-purple-200 dark:border-purple-700 text-purple-600 dark:text-purple-300"
+																: "bg-white/50 dark:bg-gray-800/50 border-white/20 dark:border-gray-700/30 hover:border-purple-300 dark:hover:border-purple-700 hover:shadow-lg hover:shadow-purple-500/10"
 																}`}
 															disabled={isConnected}
 														>
 															<option.icon className="h-4 w-4" />
 															<span className="text-sm font-medium">{option.label}</span>
-															{isConnected && (
-																<CheckCircle className="h-4 w-4 ml-auto text-purple-500" />
-															)}
+															{
+																isConnected && (
+																	<CheckCircle className="h-4 w-4 ml-auto text-purple-500" />
+																)
+															}
 														</button>
 													)
 												})
@@ -388,7 +390,7 @@ export default function InputPage() {
 							</div>
 						</div>
 						<DialogFooter className="gap-2">
-							<Button variant="outline" onClick={() => setDialogOpen(false)} className="border-gray-200 dark:border-gray-700">
+							<Button variant="outline" onClick={() => setDialogOpen(false)} className="cursor-pointer border-gray-200 dark:border-gray-700">
 								Cancel
 							</Button>
 							<Button
@@ -437,12 +439,12 @@ export default function InputPage() {
 							</div>
 						</div>
 						<DialogFooter className="gap-2">
-							<Button variant="outline" onClick={() => setCustomDialogOpen(false)} className="border-gray-200 dark:border-gray-700">
+							<Button variant="outline" onClick={() => setCustomDialogOpen(false)} className="cursor-pointer border-gray-200 dark:border-gray-700">
 								Cancel
 							</Button>
 							<Button
 								onClick={handleCustomSubmit}
-								className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white"
+								className="cursor-pointer bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white"
 								disabled={!customPlatform.trim() || !customLink.trim()}
 							>
 								Add Platform
