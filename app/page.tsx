@@ -92,7 +92,6 @@ export default function LandingPage() {
 			<div className="w-full">
 				<section className="relative min-h-screen bg-white dark:bg-black overflow-hidden flex items-center">
 					<Spotlight />
-
 					<div className="relative z-10 w-full pt-16">
 						<div className="max-w-7xl mx-auto px-6">
 							<div className="text-center space-y-2">
@@ -113,7 +112,6 @@ export default function LandingPage() {
 									</motion.div>
 									<CustomSwitch value={isEmployer} onValueChange={setIsEmployer} />
 								</div>
-
 								<motion.div
 									className="max-w-4xl mx-auto space-y-4"
 									initial={{ opacity: 0, y: 20 }}
@@ -156,27 +154,28 @@ export default function LandingPage() {
 									animate={{ opacity: 1, y: 0 }}
 									transition={{ delay: 0.4 }}
 								>
-									{currentContent.metrics.map((metric, index) => (
-										<motion.div
-											key={index}
-											className="relative group"
-											whileHover={{ scale: 1.02 }}
-											transition={{ type: "spring", stiffness: 300 }}
-										>
-											<div className="absolute inset-0 bg-gradient-to-r from-teal-500/10 to-emerald-500/10 rounded-xl blur-xl group-hover:blur-2xl transition-all duration-300" />
-											<div className="relative p-4 rounded-xl bg-white/80 dark:bg-white/5 backdrop-blur-sm border border-teal-500/20">
-												<metric.icon className="h-8 w-8 text-teal-600 dark:text-teal-400 mx-auto mb-2" />
-												<div className="text-2xl font-bold bg-gradient-to-r from-teal-600 to-emerald-600 dark:from-teal-400 dark:to-emerald-400 bg-clip-text text-transparent mb-1">
-													{metric.value}
+									{
+										currentContent.metrics.map((metric, index) => (
+											<motion.div
+												key={index}
+												className="relative group"
+												whileHover={{ scale: 1.02 }}
+												transition={{ type: "spring", stiffness: 300 }}
+											>
+												<div className="absolute inset-0 bg-gradient-to-r from-teal-500/10 to-emerald-500/10 rounded-xl blur-xl group-hover:blur-2xl transition-all duration-300" />
+												<div className="relative p-4 rounded-xl bg-white/80 dark:bg-white/5 backdrop-blur-sm border border-teal-500/20">
+													<metric.icon className="h-8 w-8 text-teal-600 dark:text-teal-400 mx-auto mb-2" />
+													<div className="text-2xl font-bold bg-gradient-to-r from-teal-600 to-emerald-600 dark:from-teal-400 dark:to-emerald-400 bg-clip-text text-transparent mb-1">
+														{metric.value}
+													</div>
+													<div className="text-gray-600 dark:text-gray-400 text-sm">
+														{metric.label}
+													</div>
 												</div>
-												<div className="text-gray-600 dark:text-gray-400 text-sm">
-													{metric.label}
-												</div>
-											</div>
-										</motion.div>
-									))}
+											</motion.div>
+										))
+									}
 								</motion.div>
-
 								<div className="space-y-6">
 									<motion.div
 										className="flex flex-col sm:flex-row gap-4 justify-center mt-8"
@@ -184,61 +183,63 @@ export default function LandingPage() {
 										animate={{ opacity: 1, y: 0 }}
 										transition={{ delay: 0.5 }}
 									>
-										{!user ? (
-											<>
-												<SignUpButton mode="modal" forceRedirectUrl="/details">
+										{
+											!user ? (
+												<>
+													<SignUpButton mode="modal" forceRedirectUrl="/details">
+														<Button className="cursor-pointer relative group px-8 py-3 rounded-xl overflow-hidden bg-gradient-to-r from-teal-500 to-emerald-500 text-white shadow-lg hover:shadow-xl transition-all duration-300">
+															<div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
+															<span className="relative">
+																Transform Your Portfolio
+																<ArrowRight className="inline-block ml-2 h-5 w-5" />
+															</span>
+														</Button>
+													</SignUpButton>
+													<SignInButton mode="modal" forceRedirectUrl="/details">
+														<Button
+															variant="outline"
+															className="cursor-pointer px-8 py-3 rounded-xl border-2 border-teal-500/50 text-teal-600 dark:text-teal-400 hover:bg-teal-50 dark:hover:bg-teal-500/10 transition-all duration-300"
+														>
+															Sign In
+														</Button>
+													</SignInButton>
+												</>
+											) : (
+												<Link href="/details">
 													<Button className="cursor-pointer relative group px-8 py-3 rounded-xl overflow-hidden bg-gradient-to-r from-teal-500 to-emerald-500 text-white shadow-lg hover:shadow-xl transition-all duration-300">
 														<div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
 														<span className="relative">
-															Transform Your Portfolio
+															Continue Building Portfolio
 															<ArrowRight className="inline-block ml-2 h-5 w-5" />
 														</span>
 													</Button>
-												</SignUpButton>
-												<SignInButton mode="modal" forceRedirectUrl="/details">
-													<Button
-														variant="outline"
-														className="cursor-pointer px-8 py-3 rounded-xl border-2 border-teal-500/50 text-teal-600 dark:text-teal-400 hover:bg-teal-50 dark:hover:bg-teal-500/10 transition-all duration-300"
-													>
-														Sign In
-													</Button>
-												</SignInButton>
-											</>
-										) : (
-											<Link href="/details">
-												<Button className="cursor-pointer relative group px-8 py-3 rounded-xl overflow-hidden bg-gradient-to-r from-teal-500 to-emerald-500 text-white shadow-lg hover:shadow-xl transition-all duration-300">
-													<div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
-													<span className="relative">
-														Continue Building Portfolio
-														<ArrowRight className="inline-block ml-2 h-5 w-5" />
-													</span>
-												</Button>
-											</Link>
-										)}
+												</Link>
+											)
+										}
 									</motion.div>
-
 									<motion.div
 										className="flex flex-wrap gap-2 justify-center mt-8"
 										initial={{ opacity: 0, y: 20 }}
 										animate={{ opacity: 1, y: 0 }}
 										transition={{ delay: 0.6 }}
 									>
-										{currentContent.features.map((feature, index) => (
-											<Badge
-												key={index}
-												variant="secondary"
-												className="bg-white/80 dark:bg-white/5 backdrop-blur-sm text-gray-600 dark:text-gray-300 border-teal-500/20 px-3 py-1"
-											>
-												✨ {feature}
-											</Badge>
-										))}
+										{
+											currentContent.features.map((feature, index) => (
+												<Badge
+													key={index}
+													variant="secondary"
+													className="bg-white/80 dark:bg-white/5 backdrop-blur-sm text-gray-600 dark:text-gray-300 border-teal-500/20 px-3 py-1"
+												>
+													✨ {feature}
+												</Badge>
+											))
+										}
 									</motion.div>
 								</div>
 							</div>
 						</div>
 					</div>
 				</section>
-
 				<section className="py-20 bg-gradient-to-br from-teal-900 via-emerald-900 to-cyan-900 dark:bg-black dark:bg-none text-white relative overflow-hidden">
 					<div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fillRule='evenodd'%3E%3Cg fill='%23ffffff' fillOpacity='0.05'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-20"></div>
 					<div className="max-w-7xl mx-auto px-6 relative z-10">
