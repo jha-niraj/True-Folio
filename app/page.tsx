@@ -49,25 +49,30 @@ function CustomSwitch({ value, onValueChange }: { value: boolean; onValueChange:
 	)
 }
 const studentContent = {
-	title: "Where Traditional Portfolios Go to Retire",
+	title: "Let's do this.",
 	description:
-		"Tired of your portfolio looking like a 90's resume with a GitHub link? We use AI to transform your messy code history into a masterpiece that even your tech lead would approve. Because let's be honest, recruiters don't want to count your commit messages.",
+		"Transform your coding journey into a compelling story. Our AI analyzes your platforms, creates personalized action plans, and helps you showcase your true potential to employers. No more generic portfolios - stand out with real, verified achievements.",
 	metrics: [
-		{ label: "Portfolios Transformed", value: "15K+", icon: Users },
-		{ label: "Interview Success Rate", value: "85%", icon: CheckCircle },
-		{ label: "Time Saved/Dev", value: "12hrs", icon: TrendingUp },
+		{ label: "Success Rate", value: "85%", icon: CheckCircle },
+		{ label: "Time Optimized", value: "12hrs", icon: TrendingUp },
+		{ label: "Dev Community", value: "15K+", icon: Users },
 	],
-	features: ["AI Resume Whisperer", "Git History Beautifier", "Achievement Unlocked System", "Recruiter Magnet Mode"],
+	features: [
+		"AI-Powered Portfolio Analysis",
+		"Real-time Skill Verification",
+		"Personalized Growth Path",
+		"Smart Achievement Tracking"
+	],
 }
 
 const employerContent = {
 	title: "Find Exceptional Talent Fast",
 	description:
-		"Skip the guesswork in hiring. Access candidates with AI-verified skills, real-time portfolios, and proven track records.",
+		"Skip the guesswork in hiring. Access candidates with AI-verified skills, real-time portfolios, and proven track records. Our platform helps you identify top developers who can make an immediate impact.",
 	metrics: [
-		{ label: "Employers Trust Us", value: "3.5K+", icon: Users },
-		{ label: "Successful Hires", value: "12K+", icon: CheckCircle },
+		{ label: "Hiring Success", value: "92%", icon: CheckCircle },
 		{ label: "Time Saved", value: "75%", icon: TrendingUp },
+		{ label: "Active Talents", value: "10K+", icon: Users },
 	],
 	features: [
 		"AI-verified candidates",
@@ -102,7 +107,7 @@ export default function LandingPage() {
 										>
 											<Star className="h-4 w-4 mr-2 text-teal-500" />
 											<span className="bg-gradient-to-r from-teal-500 to-emerald-500 bg-clip-text text-transparent font-medium">
-												AI-Powered Portfolio Revolution
+												{isEmployer ? "AI-Powered Talent Platform" : "AI-Powered Portfolio Revolution"}
 											</span>
 										</Badge>
 									</motion.div>
@@ -116,20 +121,35 @@ export default function LandingPage() {
 									transition={{ delay: 0.3 }}
 								>
 									<h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight">
-										<span className="text-gray-900 dark:text-white">Build a </span>
-										<span className="bg-gradient-to-r from-teal-400 via-emerald-400 to-gray-900 dark:to-white bg-clip-text text-transparent">
-											Portfolio
-										</span>
-										<span className="text-gray-900 dark:text-white"> that </span>
-										<span className="bg-gradient-to-r from-gray-900 dark:from-white via-emerald-400 to-teal-400 bg-clip-text text-transparent">
-											Actually Works
-										</span>
+										{
+											isEmployer ? (
+												<>
+													<span className="text-gray-900 dark:text-white">Find </span>
+													<span className="bg-gradient-to-r from-teal-400 via-emerald-400 to-gray-900 dark:to-white bg-clip-text text-transparent">
+														Exceptional
+													</span>
+													<span className="text-gray-900 dark:text-white"> Talent </span>
+													<span className="bg-gradient-to-r from-gray-900 dark:from-white via-emerald-400 to-teal-400 bg-clip-text text-transparent">
+														Fast
+													</span>
+												</>) : (
+												<>
+													<span className="text-gray-900 dark:text-white">Build a </span>
+													<span className="bg-gradient-to-r from-teal-400 via-emerald-400 to-gray-900 dark:to-white bg-clip-text text-transparent">
+														Portfolio
+													</span>
+													<span className="text-gray-900 dark:text-white"> that </span>
+													<span className="bg-gradient-to-r from-gray-900 dark:from-white via-emerald-400 to-teal-400 bg-clip-text text-transparent">
+														Actually Works
+													</span>
+												</>
+											)
+										}
 									</h1>
 									<p className="text-lg md:text-xl text-gray-600 dark:text-gray-400 leading-relaxed max-w-3xl mx-auto">
 										{currentContent.description}
 									</p>
 								</motion.div>
-
 								<motion.div
 									className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-5xl mx-auto"
 									initial={{ opacity: 0, y: 20 }}
@@ -323,370 +343,6 @@ export default function LandingPage() {
 				<FeaturesSection />
 				<TestimonialsSection />
 				<CTASection SignUpButton={SignUpButton} />
-
-				{/* {!isEmployer && (
-					<>
-						<section className="py-24 bg-white dark:bg-black relative overflow-hidden">
-							<div className="absolute inset-0 bg-gradient-to-br from-blue-50/30 to-purple-50/30 dark:from-blue-900/10 dark:to-purple-900/10" />
-							<div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fillRule='evenodd'%3E%3Cg fill='%234338ca' fillOpacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-40 dark:opacity-20" />
-							<div className="max-w-7xl mx-auto px-6 relative z-10">
-								<motion.div
-									className="text-center mb-16"
-									initial={{ opacity: 0, y: 30 }}
-									whileInView={{ opacity: 1, y: 0 }}
-									transition={{ duration: 0.8 }}
-									viewport={{ once: true }}
-								>
-									<Badge className="px-4 py-2 mb-4 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full">
-										<Briefcase className="h-4 w-4 mr-2 inline-block" />
-										Career Opportunities
-									</Badge>
-									<h2 className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 dark:from-blue-400 dark:via-indigo-400 dark:to-purple-400 bg-clip-text text-transparent mb-6">
-										Apply to Jobs Directly
-									</h2>
-									<p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed">
-										Skip the endless job boards. Apply directly to companies through our platform with your verified
-										portfolio and get noticed by top employers.
-									</p>
-								</motion.div>
-								<div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-									<motion.div
-										initial={{ opacity: 0, y: 30 }}
-										whileInView={{ opacity: 1, y: 0 }}
-										transition={{ duration: 0.6 }}
-										viewport={{ once: true }}
-										className="group"
-									>
-										<div className="relative h-full">
-											<div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-blue-600/5 dark:from-blue-500/10 dark:to-blue-600/10 rounded-2xl transform group-hover:scale-105 transition-transform duration-300" />
-											<Card className="h-full bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border-0 shadow-lg group-hover:shadow-xl transition-all duration-300">
-												<CardHeader>
-													<div className="p-4 bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl w-fit mx-auto mb-4 group-hover:scale-110 transition-transform duration-300 shadow-lg">
-														<Briefcase className="h-8 w-8 text-white" />
-													</div>
-													<CardTitle className="text-xl text-center dark:text-white">Curated Opportunities</CardTitle>
-												</CardHeader>
-												<CardContent>
-													<CardDescription className="text-gray-600 dark:text-gray-300 text-center text-base leading-relaxed">
-														Access exclusive job openings from top tech companies looking for verified talent. Get matched with positions that align with your skills and career goals.
-													</CardDescription>
-												</CardContent>
-											</Card>
-										</div>
-									</motion.div>
-									<motion.div
-										initial={{ opacity: 0, y: 30 }}
-										whileInView={{ opacity: 1, y: 0 }}
-										transition={{ duration: 0.6, delay: 0.1 }}
-										viewport={{ once: true }}
-										className="group"
-									>
-										<div className="relative h-full">
-											<div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-green-600/5 dark:from-green-500/10 dark:to-green-600/10 rounded-2xl transform group-hover:scale-105 transition-transform duration-300" />
-											<Card className="h-full bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border-0 shadow-lg group-hover:shadow-xl transition-all duration-300">
-												<CardHeader>
-													<div className="p-4 bg-gradient-to-r from-green-500 to-green-600 rounded-2xl w-fit mx-auto mb-4 group-hover:scale-110 transition-transform duration-300 shadow-lg">
-														<Shield className="h-8 w-8 text-white" />
-													</div>
-													<CardTitle className="text-xl text-center dark:text-white">Verified Applications</CardTitle>
-												</CardHeader>
-												<CardContent>
-													<CardDescription className="text-gray-600 dark:text-gray-300 text-center text-base leading-relaxed">
-														Stand out with AI-verified skills and achievements that employers trust. Your portfolio becomes your competitive advantage in the job market.
-													</CardDescription>
-												</CardContent>
-											</Card>
-										</div>
-									</motion.div>
-									<motion.div
-										initial={{ opacity: 0, y: 30 }}
-										whileInView={{ opacity: 1, y: 0 }}
-										transition={{ duration: 0.6, delay: 0.2 }}
-										viewport={{ once: true }}
-										className="group"
-									>
-										<div className="relative h-full">
-											<div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-purple-600/5 dark:from-purple-500/10 dark:to-purple-600/10 rounded-2xl transform group-hover:scale-105 transition-transform duration-300" />
-											<Card className="h-full bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border-0 shadow-lg group-hover:shadow-xl transition-all duration-300">
-												<CardHeader>
-													<div className="p-4 bg-gradient-to-r from-purple-500 to-purple-600 rounded-2xl w-fit mx-auto mb-4 group-hover:scale-110 transition-transform duration-300 shadow-lg">
-														<TrendingUp className="h-8 w-8 text-white" />
-													</div>
-													<CardTitle className="text-xl text-center dark:text-white">Higher Success Rate</CardTitle>
-												</CardHeader>
-												<CardContent>
-													<CardDescription className="text-gray-600 dark:text-gray-300 text-center text-base leading-relaxed">
-														Experience a 3x higher interview rate compared to traditional applications. Our platform helps you bypass the traditional hiring barriers.
-													</CardDescription>
-												</CardContent>
-											</Card>
-										</div>
-									</motion.div>
-								</div>
-							</div>
-						</section>
-
-						<section className="py-24 relative overflow-hidden">
-							<div className="absolute inset-0 bg-gradient-to-br from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20" />
-							<div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fillRule='evenodd'%3E%3Cg fill='%2322c55e' fillOpacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-40 dark:opacity-20" />
-							<div className="max-w-7xl mx-auto px-6 relative z-10">
-								<motion.div
-									className="text-center mb-16"
-									initial={{ opacity: 0, y: 30 }}
-									whileInView={{ opacity: 1, y: 0 }}
-									transition={{ duration: 0.8 }}
-									viewport={{ once: true }}
-								>
-									<Badge className="px-4 py-2 mb-4 bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded-full">
-										<Star className="h-4 w-4 mr-2 inline-block" />
-										Success Stories
-									</Badge>
-									<h2 className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-green-600 via-teal-600 to-blue-600 dark:from-green-400 dark:via-teal-400 dark:to-blue-400 bg-clip-text text-transparent mb-6">
-										Student Success Stories
-									</h2>
-									<p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed">
-										Join our community of successful developers who have transformed their careers through our platform
-									</p>
-								</motion.div>
-								<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-									{[
-										{ name: "Alex", role: "SDE at Google", salary: "$180k", time: "3 weeks", color: "from-blue-500 to-indigo-500" },
-										{ name: "Priya", role: "Frontend at Meta", salary: "$165k", time: "2 months", color: "from-purple-500 to-pink-500" },
-										{ name: "David", role: "Backend at Netflix", salary: "$170k", time: "1 month", color: "from-red-500 to-orange-500" },
-										{ name: "Sarah", role: "Full Stack at Stripe", salary: "$160k", time: "6 weeks", color: "from-teal-500 to-green-500" },
-									].map((story, index) => (
-										<motion.div
-											key={index}
-											initial={{ opacity: 0, y: 30 }}
-											whileInView={{ opacity: 1, y: 0 }}
-											transition={{ duration: 0.6, delay: index * 0.1 }}
-											viewport={{ once: true }}
-											className="group"
-										>
-											<div className="relative">
-												<div className="absolute inset-0 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800/50 dark:to-gray-700/50 rounded-2xl transform group-hover:scale-105 transition-transform duration-300" />
-												<Card className="relative bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border-0 shadow-lg group-hover:shadow-xl transition-all duration-300">
-													<CardContent className="pt-6">
-														<div className={`w-16 h-16 bg-gradient-to-r ${story.color} rounded-2xl flex items-center justify-center text-white font-bold text-2xl mx-auto mb-4 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-															{story.name[0]}
-														</div>
-														<h3 className="text-xl font-bold mb-2 dark:text-white">{story.name}</h3>
-														<p className="text-gray-600 dark:text-gray-300 mb-3 text-base">{story.role}</p>
-														<div className="bg-green-50 dark:bg-green-900/30 rounded-full py-2 px-4 mb-3">
-															<p className="text-green-600 dark:text-green-400 font-bold text-lg">{story.salary}</p>
-														</div>
-														<div className="flex items-center justify-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-															<Clock className="h-4 w-4" />
-															<p>Hired in {story.time}</p>
-														</div>
-													</CardContent>
-												</Card>
-											</div>
-										</motion.div>
-									))}
-								</div>
-							</div>
-						</section>
-					</>
-				)}
-
-				{isEmployer && (
-					<section className="py-20 bg-gradient-to-br from-blue-50 to-purple-50 dark:bg-black dark:bg-none">
-						<div className="max-w-7xl mx-auto px-6">
-							<motion.div
-								className="text-center mb-12"
-								initial={{ opacity: 0, y: 30 }}
-								whileInView={{ opacity: 1, y: 0 }}
-								transition={{ duration: 0.8 }}
-								viewport={{ once: true }}
-							>
-								<h2 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent mb-4">
-									Why Top Companies Choose Us
-								</h2>
-								<p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-									Join industry leaders who trust our platform for their hiring needs
-								</p>
-							</motion.div>
-							<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-								<motion.div
-									initial={{ opacity: 0, y: 30 }}
-									whileInView={{ opacity: 1, y: 0 }}
-									transition={{ duration: 0.6 }}
-									viewport={{ once: true }}
-								>
-									<Card className="text-center border-gray-200 dark:border-gray-700 dark:bg-gray-800 hover:shadow-lg transition-all duration-300 group">
-										<CardHeader>
-											<div className="p-3 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl w-fit mx-auto mb-3 group-hover:scale-110 transition-transform">
-												<Building2 className="h-8 w-8 text-white" />
-											</div>
-											<CardTitle className="text-lg dark:text-white">Pre-Screened Talent</CardTitle>
-										</CardHeader>
-										<CardContent>
-											<CardDescription className="text-gray-600 dark:text-gray-300">
-												All candidates come with AI-verified skills and real project portfolios
-											</CardDescription>
-										</CardContent>
-									</Card>
-								</motion.div>
-								<motion.div
-									initial={{ opacity: 0, y: 30 }}
-									whileInView={{ opacity: 1, y: 0 }}
-									transition={{ duration: 0.6, delay: 0.1 }}
-									viewport={{ once: true }}
-								>
-									<Card className="text-center border-gray-200 dark:border-gray-700 dark:bg-gray-800 hover:shadow-lg transition-all duration-300 group">
-										<CardHeader>
-											<div className="p-3 bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl w-fit mx-auto mb-3 group-hover:scale-110 transition-transform">
-												<Zap className="h-8 w-8 text-white" />
-											</div>
-											<CardTitle className="text-lg dark:text-white">Faster Hiring</CardTitle>
-										</CardHeader>
-										<CardContent>
-											<CardDescription className="text-gray-600 dark:text-gray-300">
-												Reduce time-to-hire by 75% with our intelligent matching algorithm
-											</CardDescription>
-										</CardContent>
-									</Card>
-								</motion.div>
-								<motion.div
-									initial={{ opacity: 0, y: 30 }}
-									whileInView={{ opacity: 1, y: 0 }}
-									transition={{ duration: 0.6, delay: 0.2 }}
-									viewport={{ once: true }}
-								>
-									<Card className="text-center border-gray-200 dark:border-gray-700 dark:bg-gray-800 hover:shadow-lg transition-all duration-300 group">
-										<CardHeader>
-											<div className="p-3 bg-gradient-to-r from-green-500 to-green-600 rounded-xl w-fit mx-auto mb-3 group-hover:scale-110 transition-transform">
-												<Award className="h-8 w-8 text-white" />
-											</div>
-											<CardTitle className="text-lg dark:text-white">Quality Guarantee</CardTitle>
-										</CardHeader>
-										<CardContent>
-											<CardDescription className="text-gray-600 dark:text-gray-300">
-												95% of our placements exceed performance expectations in their first year
-											</CardDescription>
-										</CardContent>
-									</Card>
-								</motion.div>
-							</div>
-						</div>
-					</section>
-				)}
-
-				<section className="py-20 bg-white dark:bg-black">
-					<div className="max-w-7xl mx-auto px-6">
-						<motion.div
-							className="text-center mb-16"
-							initial={{ opacity: 0, y: 30 }}
-							whileInView={{ opacity: 1, y: 0 }}
-							transition={{ duration: 0.8 }}
-							viewport={{ once: true }}
-						>
-							<h2 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 dark:from-gray-200 dark:to-gray-400 bg-clip-text text-transparent mb-4">
-								Powerful Features for Modern Careers
-							</h2>
-							<p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-								Everything you need to showcase your skills and connect with opportunities in the digital age
-							</p>
-						</motion.div>
-						<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-							{
-								features.map((feature, index) => (
-									<motion.div
-										key={index}
-										initial={{ opacity: 0, y: 30 }}
-										whileInView={{ opacity: 1, y: 0 }}
-										transition={{ duration: 0.6, delay: index * 0.1 }}
-										viewport={{ once: true }}
-									>
-										<Card className="border-gray-200 dark:border-gray-700 hover:border-gray-300 transition-all duration-300 hover:shadow-lg group">
-											<CardHeader>
-												<div className="flex items-center gap-4">
-													<div
-														className={`p-3 bg-gradient-to-r ${feature.color} rounded-xl group-hover:scale-110 transition-transform duration-300`}
-													>
-														<feature.icon className="h-6 w-6 text-white" />
-													</div>
-													<CardTitle className="text-lg text-gray-900 dark:text-gray-100">{feature.title}</CardTitle>
-												</div>
-											</CardHeader>
-											<CardContent>
-												<CardDescription className="text-gray-600 dark:text-gray-300 leading-relaxed">{feature.description}</CardDescription>
-											</CardContent>
-										</Card>
-									</motion.div>
-								))
-							}
-						</div>
-					</div>
-				</section>
-
-				<section className="py-20 bg-gradient-to-br from-gray-50 to-gray-100 dark:bg-black dark:bg-none">
-					<div className="max-w-7xl mx-auto px-6">
-						<motion.div
-							className="text-center mb-16"
-							initial={{ opacity: 0, y: 30 }}
-							whileInView={{ opacity: 1, y: 0 }}
-							transition={{ duration: 0.8 }}
-							viewport={{ once: true }}
-						>
-							<h2 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 dark:from-gray-200 dark:to-gray-400 bg-clip-text text-transparent mb-4">
-								Trusted by Industry Leaders
-							</h2>
-							<p className="text-lg text-gray-600 dark:text-gray-300">See how our platform is transforming careers and hiring</p>
-						</motion.div>
-						<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-							{
-								testimonials.map((testimonial, index) => (
-									<motion.div
-										key={index}
-										initial={{ opacity: 0, y: 30 }}
-										whileInView={{ opacity: 1, y: 0 }}
-										transition={{ duration: 0.6, delay: index * 0.2 }}
-										viewport={{ once: true }}
-									>
-										<Card className="border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:shadow-lg transition-all duration-300">
-											<CardContent className="pt-6">
-												<blockquote className="text-gray-700 dark:text-gray-300 mb-4 leading-relaxed">"{testimonial.text}"</blockquote>
-												<div className="flex items-center gap-4">
-													<div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold">
-														{testimonial.avatar}
-													</div>
-													<div>
-														<div className="font-semibold text-gray-900 dark:text-gray-100">{testimonial.author}</div>
-														<div className="text-sm text-gray-600 dark:text-gray-400">{testimonial.role}</div>
-													</div>
-												</div>
-											</CardContent>
-										</Card>
-									</motion.div>
-								))
-							}
-						</div>
-					</div>
-				</section>
-
-				<section className="py-20 bg-gradient-to-r from-teal-600 to-emerald-600 dark:from-teal-900/50 dark:to-emerald-900/50">
-					<div className="max-w-7xl mx-auto px-6 text-center">
-						<motion.div
-							initial={{ opacity: 0, y: 30 }}
-							whileInView={{ opacity: 1, y: 0 }}
-							transition={{ duration: 0.8 }}
-							viewport={{ once: true }}
-						>
-							<h2 className="text-3xl lg:text-4xl font-bold text-white mb-4">Ready to Transform Your Career?</h2>
-							<p className="text-lg text-teal-100 mb-8 max-w-2xl mx-auto">
-								Join thousands of professionals who've accelerated their careers with AI-powered portfolios
-							</p>
-							<SignUpButton mode="modal" forceRedirectUrl="/details">
-								<Button className="bg-white dark:bg-gray-900 text-teal-600 dark:text-teal-400 hover:bg-gray-100 dark:hover:bg-gray-800 px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
-									Start Building Now
-									<ArrowRight className="ml-2 h-5 w-5" />
-								</Button>
-							</SignUpButton>
-						</motion.div>
-					</div>
-				</section> */}
 			</div>
 		</SmoothScroll>
 	)
