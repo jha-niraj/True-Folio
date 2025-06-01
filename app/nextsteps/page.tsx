@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 import { useSearchParams } from "next/navigation"
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
@@ -233,7 +233,8 @@ const platformData = {
 
 const allPlatforms = ["github", "leetcode", "linkedin", "twitter", "medium"]
 
-export default function NextStepsPage() {
+// Create a client component for the main content
+function NextStepsContent() {
     const searchParams = useSearchParams()
     const [unlockedPlatforms, setUnlockedPlatforms] = useState<string[]>(["github"])
     const [credits, setCredits] = useState(5)
@@ -613,5 +614,18 @@ export default function NextStepsPage() {
                 </Dialog>
             </div>
         </div>
+    )
+}
+
+// Main page component with Suspense boundary
+export default function NextStepsPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
+            </div>
+        }>
+            <NextStepsContent />
+        </Suspense>
     )
 }
