@@ -65,7 +65,7 @@ export function Navbar() {
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.6 }}
                 className={cn(
-                    "w-[96%] max-w-7xl mx-auto rounded-2xl transition-all duration-300",
+                    "w-[96%] max-w-6xl mx-auto rounded-2xl transition-all duration-300",
                     scrolled
                         ? "bg-white/70 dark:bg-gray-900/70 backdrop-blur-lg shadow-lg dark:shadow-gray-800/30"
                         : "bg-white/50 dark:bg-gray-900/50 backdrop-blur-md",
