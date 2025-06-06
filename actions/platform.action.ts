@@ -154,18 +154,15 @@ export async function getUserPlatforms() {
 		const { userId } = await auth();
 		if (!userId) throw new Error('Unauthorized');
 
-		// Get user from database
 		const user = await prisma.user.findFirst({
 			where: { clerkId: userId }
 		});
 		if (!user) throw new Error('User not found');
 
-		// Get all platforms for the user
 		const platforms = await prisma.platform.findMany({
 			where: { userId: user.id }
 		});
 
-		// Format the response to match the UI structure
 		return platforms.map(platform => ({
 			platform: platform.type.toLowerCase(),
 			link: platform.profileUrl,

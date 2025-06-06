@@ -403,7 +403,6 @@ export default function InputPage() {
 						</DialogFooter>
 					</DialogContent>
 				</Dialog>
-
 				<Dialog open={customDialogOpen} onOpenChange={setCustomDialogOpen}>
 					<DialogContent className="sm:max-w-md backdrop-blur-xl bg-white/70 dark:bg-gray-800/70 border-white/20 dark:border-gray-700/30">
 						<DialogHeader>
