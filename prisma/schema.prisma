@@ -29,7 +29,7 @@ model User {
     clerkId       String    @unique
     email         String    @unique
     name          String?
-    avatar      String?
+    avatar        String?
     platforms     Platform[]
     createdAt     DateTime  @default(now())
     updatedAt     DateTime  @updatedAt
@@ -56,4 +56,20 @@ model PortfolioInsight {
     data          Json      
     createdAt     DateTime  @default(now())
     updatedAt     DateTime  @updatedAt
+}
+
+model PortfolioCard {
+    id            String    @id @default(cuid())
+    userId        String
+    title         String
+    description   String
+    cardData      Json      // Stores the card's visual data like metrics, skills, highlights
+    imageUrl      String?   // Generated card image URL
+    isPublic      Boolean   @default(false)
+    shareCount    Int       @default(0)
+    createdAt     DateTime  @default(now())
+    updatedAt     DateTime  @updatedAt
+
+    @@index([userId])
+    @@index([createdAt])
 }

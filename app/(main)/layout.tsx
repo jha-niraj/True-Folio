@@ -12,7 +12,8 @@ import {
     FolderKanban,
     GitBranch,
     WifiOff,
-    RotateCcw
+    RotateCcw,
+    ImageIcon
 } from 'lucide-react';
 import Sidebar, { Route } from '@/components/main-sidebar';
 import MainNavbar from '@/components/main-navbar';
@@ -53,6 +54,12 @@ const Layout = ({ children }: LayoutProps) => {
             path: "portfolio",
             name: "Portfolio",
             icon: <User className="h-5 w-5" />,
+            status: "active"
+        },
+        {
+            path: "cards",
+            name: "Cards",
+            icon: <ImageIcon className="h-5 w-5" />,
             status: "active"
         },
         {

@@ -392,7 +392,6 @@ export default function InputPage() {
 						)
 					}
 				</motion.div>
-
 				<Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
 					<DialogContent className="sm:max-w-md backdrop-blur-xl bg-white/70 dark:bg-gray-800/70 border-white/20 dark:border-gray-700/30">
 						<DialogHeader>

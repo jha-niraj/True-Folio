@@ -18,44 +18,45 @@ import {
     Copy, RefreshCw, Github, Code2, Linkedin, Twitter, FileText, Mail, ExternalLink, Award,
     TrendingUp, Sparkles, Target, ArrowRight, Briefcase, Brain, CheckCircle2, Zap, CreditCard,
     User, Calendar, DollarSign, Activity, Users, Trophy, Lightbulb, Rocket, Star, Layers,
-    BarChart3, GitBranch, Shield, Clock, Globe
+    BarChart3, GitBranch, Shield, Clock, Globe, ImageIcon, Share, Download
 } from "lucide-react"
 import { generatePortfolioInsights, forceRefreshPortfolioInsights } from "@/actions/platform.action"
+import { createPortfolioCard } from "@/actions/card.action"
 
 interface PortfolioInsights {
-	summary: {
-		title: string
-		description: string
-		yearOfExperience?: string
-	}
-	skills: {
-		languages: string[]
-		frameworks: string[]
-		tools: string[]
-		specializations?: string[]
-	}
-	insights: {
-		strengths: string[]
-		improvements: string[]
-		recommendations: string[]
-		projectHighlights?: string[]
-	}
-	metrics: {
-		githubActivity: string
-		codingProficiency: string
-		overallScore: string
-		activityLevel?: string
-		collaborationScore?: string
-	}
-	careerPath?: {
-		currentLevel: string
-		nextSteps: string[]
-		roleRecommendations: string[]
-		salaryRange: string
-	}
-	// New properties for caching
-	_cached?: boolean
-	_cacheAge?: number
+    summary: {
+        title: string
+        description: string
+        yearOfExperience?: string
+    }
+    skills: {
+        languages: string[]
+        frameworks: string[]
+        tools: string[]
+        specializations?: string[]
+    }
+    insights: {
+        strengths: string[]
+        improvements: string[]
+        recommendations: string[]
+        projectHighlights?: string[]
+    }
+    metrics: {
+        githubActivity: string
+        codingProficiency: string
+        overallScore: string
+        activityLevel?: string
+        collaborationScore?: string
+    }
+    careerPath?: {
+        currentLevel: string
+        nextSteps: string[]
+        roleRecommendations: string[]
+        salaryRange: string
+    }
+    // New properties for caching
+    _cached?: boolean
+    _cacheAge?: number
 }
 
 export default function PortfolioDetails({ username }: { username: string }) {
@@ -68,6 +69,8 @@ export default function PortfolioDetails({ username }: { username: string }) {
     const [jobDialogOpen, setJobDialogOpen] = useState(false)
     const [creditDialogOpen, setCreditDialogOpen] = useState(false)
     const [refreshDialogOpen, setRefreshDialogOpen] = useState(false)
+    const [cardDialogOpen, setCardDialogOpen] = useState(false)
+    const [isGeneratingCard, setIsGeneratingCard] = useState(false)
     const [waitlistSubmitted, setWaitlistSubmitted] = useState(false)
     const [selectedPlatform, setSelectedPlatform] = useState("")
     const [formData, setFormData] = useState({
@@ -94,12 +97,12 @@ export default function PortfolioDetails({ username }: { username: string }) {
                 setIsLoading(true)
                 const data = await generatePortfolioInsights(user?.id || "")
                 setInsights(data)
-                
+
                 // Show toast message based on cache status
                 if (data._cached) {
-                    const ageText = data._cacheAge === 0 ? 'today' : 
-                                   data._cacheAge === 1 ? '1 day ago' : 
-                                   `${data._cacheAge} days ago`
+                    const ageText = data._cacheAge === 0 ? 'today' :
+                        data._cacheAge === 1 ? '1 day ago' :
+                            `${data._cacheAge} days ago`
                     toast.info(`📊 Showing previously generated insights (from ${ageText})`, {
                         description: "Your insights are updated automatically every 10 days",
                         duration: 5000,
@@ -175,6 +178,60 @@ export default function PortfolioDetails({ username }: { username: string }) {
         window.location.href = `/next-steps?platform=${selectedPlatform}`
     }
 
+    const handleGenerateCard = () => {
+        setCardDialogOpen(true)
+    }
+
+    const handleCreateCard = async () => {
+        setIsGeneratingCard(true)
+        try {
+            // Create card data from insights
+            const cardData = {
+                title: insights?.summary.title || "Developer Portfolio",
+                description: insights?.summary.description || "",
+                metrics: {
+                    overallScore: insights?.metrics.overallScore || "0",
+                    activityLevel: insights?.metrics.activityLevel || "N/A",
+                    collaborationScore: insights?.metrics.collaborationScore || "N/A"
+                },
+                skills: {
+                    languages: insights?.skills.languages.slice(0, 6) || [],
+                    frameworks: insights?.skills.frameworks.slice(0, 4) || []
+                },
+                highlights: insights?.insights.strengths.slice(0, 3) || [],
+                careerLevel: insights?.careerPath?.currentLevel || "Developer",
+                userName: user?.fullName || "Developer",
+                userAvatar: user?.imageUrl || ""
+            }
+
+            // Call server action instead of API
+            const result = await createPortfolioCard({
+                title: cardData.title,
+                description: cardData.description,
+                cardData: cardData,
+                isPublic: true
+            });
+
+            if (result.success) {
+                toast.success("🎨 Portfolio card generated successfully!", {
+                    description: "Your shareable card is ready to download and share",
+                    duration: 4000,
+                })
+
+                setCardDialogOpen(false)
+                // Redirect to cards page
+                window.location.href = '/cards'
+            } else {
+                throw new Error(result.error || 'Failed to create card');
+            }
+        } catch (error) {
+            console.error('Error creating card:', error);
+            toast.error("Failed to generate card")
+        } finally {
+            setIsGeneratingCard(false)
+        }
+    }
+
     // Loading component with dark theme support
     const LoadingSpinner = () => (
         <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 dark:from-background dark:via-background dark:to-muted/5 flex items-center justify-center">
@@ -214,12 +271,12 @@ export default function PortfolioDetails({ username }: { username: string }) {
                         <CardHeader className="text-center pb-4">
                             <motion.div
                                 className="mx-auto w-16 h-16 bg-gradient-to-br from-destructive/20 to-destructive/10 rounded-full flex items-center justify-center mb-4"
-                                animate={{ 
+                                animate={{
                                     scale: [1, 1.1, 1],
                                     rotate: [0, 5, -5, 0]
                                 }}
-                                transition={{ 
-                                    duration: 2, 
+                                transition={{
+                                    duration: 2,
                                     repeat: Infinity,
                                     ease: "easeInOut"
                                 }}
@@ -263,20 +320,20 @@ export default function PortfolioDetails({ username }: { username: string }) {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 dark:from-background dark:via-background dark:to-muted/5">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
                 {/* Header Section */}
                 <motion.div
-                    className="mb-8"
+                    className="mb-6 sm:mb-8"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6 }}
                 >
-                    <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
-                        <div className="flex items-center gap-6">
+                    <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 lg:gap-6">
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 w-full lg:w-auto">
                             <div className="relative">
-                                <Avatar className="h-20 w-20 border-4 border-primary/10 shadow-lg">
+                                <Avatar className="h-16 w-16 sm:h-20 sm:w-20 border-4 border-primary/10 shadow-lg">
                                     <AvatarImage src={mockUserData.avatar} alt={mockUserData.name} />
-                                    <AvatarFallback className="text-xl bg-gradient-to-r from-primary to-primary/80 text-primary-foreground">
+                                    <AvatarFallback className="text-lg sm:text-xl bg-gradient-to-r from-primary to-primary/80 text-primary-foreground">
                                         {mockUserData.name
                                             .split(" ")
                                             .map((n) => n[0])
@@ -284,65 +341,75 @@ export default function PortfolioDetails({ username }: { username: string }) {
                                     </AvatarFallback>
                                 </Avatar>
                                 {mockUserData.verified && (
-                                    <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center border-2 border-background">
-                                        <Shield className="h-3 w-3 text-white" />
+                                    <div className="absolute -bottom-1 -right-1 w-5 h-5 sm:w-6 sm:h-6 bg-emerald-500 rounded-full flex items-center justify-center border-2 border-background">
+                                        <Shield className="h-2.5 w-2.5 sm:h-3 sm:w-3 text-white" />
                                     </div>
                                 )}
                             </div>
-                            <div>
-                                <div className="flex items-center gap-3 mb-2">
-                                    <h1 className="text-2xl sm:text-3xl font-bold text-foreground">{mockUserData.name}</h1>
+                            <div className="min-w-0 flex-1">
+                                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-2">
+                                    <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground truncate">{mockUserData.name}</h1>
                                     {mockUserData.verified && (
-                                        <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20 hover:bg-emerald-500/20">
+                                        <Badge className="w-fit bg-emerald-500/10 text-emerald-600 border-emerald-500/20 hover:bg-emerald-500/20">
                                             <Award className="h-3 w-3 mr-1" />
                                             AI Verified
                                         </Badge>
                                     )}
                                 </div>
-                                <p className="text-lg sm:text-xl text-muted-foreground mb-3">{insights.summary.title}</p>
-                                <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+                                <p className="text-base sm:text-lg lg:text-xl text-muted-foreground mb-3">{insights.summary.title}</p>
+                                <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-xs sm:text-sm text-muted-foreground">
                                     <div className="flex items-center gap-2">
-                                        <Calendar className="h-4 w-4" />
+                                        <Calendar className="h-3 w-3 sm:h-4 sm:w-4" />
                                         <span>Joined {mockUserData.joinedDate}</span>
                                     </div>
                                     <div className="flex items-center gap-2">
-                                        <BarChart3 className="h-4 w-4 text-primary" />
+                                        <BarChart3 className="h-3 w-3 sm:h-4 sm:w-4 text-primary" />
                                         <span className="text-foreground font-semibold">{insights.metrics.overallScore}/100</span>
                                     </div>
                                     <div className="flex items-center gap-2">
-                                        <Zap className="h-4 w-4 text-yellow-500" />
+                                        <Zap className="h-3 w-3 sm:h-4 sm:w-4 text-yellow-500" />
                                         <span className="font-medium">{mockUserData.credits} Credits</span>
                                     </div>
                                     {insights.summary.yearOfExperience && (
                                         <div className="flex items-center gap-2">
-                                            <Clock className="h-4 w-4" />
+                                            <Clock className="h-3 w-3 sm:h-4 sm:w-4" />
                                             <span>{insights.summary.yearOfExperience} Experience</span>
                                         </div>
                                     )}
                                 </div>
                             </div>
                         </div>
-                        
+
                         {/* Action buttons */}
-                        <div className="flex items-center gap-3">
+                        <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full lg:w-auto">
                             <Button
                                 variant="outline"
                                 size="sm"
                                 onClick={handleCopyLink}
-                                className="hover:bg-primary/5"
+                                className="flex-1 sm:flex-none hover:bg-primary/5"
                             >
-                                <Copy className="h-4 w-4 mr-2" />
+                                <Copy className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
                                 Copy Link
+                            </Button>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={handleGenerateCard}
+                                className="flex-1 sm:flex-none hover:bg-primary/5 bg-gradient-to-r from-purple-500/10 to-pink-500/10 border-purple-500/20 text-purple-600 dark:text-purple-400"
+                            >
+                                <ImageIcon className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
+                                Create Card
                             </Button>
                             <Button
                                 variant="outline"
                                 size="sm"
                                 onClick={handleRefresh}
                                 disabled={isRefreshing}
-                                className="hover:bg-primary/5"
+                                className="flex-1 sm:flex-none hover:bg-primary/5"
                             >
-                                <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
-                                {isRefreshing ? 'Refreshing...' : 'Refresh'}
+                                <RefreshCw className={`h-3 w-3 sm:h-4 sm:w-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
+                                <span className="hidden sm:inline">{isRefreshing ? 'Refreshing...' : 'Refresh'}</span>
+                                <span className="sm:hidden">{isRefreshing ? '...' : 'Refresh'}</span>
                             </Button>
                         </div>
                     </div>
@@ -350,44 +417,44 @@ export default function PortfolioDetails({ username }: { username: string }) {
 
                 {/* Skills Preview */}
                 <motion.div
-                    className="flex flex-wrap gap-2 mb-8"
+                    className="flex flex-wrap gap-1.5 sm:gap-2 mb-6 sm:mb-8"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, delay: 0.2 }}
                 >
                     {insights.skills.languages.slice(0, 5).map((skill, index) => (
-                        <Badge key={index} variant="secondary" className="bg-blue-500/10 text-blue-600 border-blue-500/20 hover:bg-blue-500/20 transition-colors">
-                            <Code2 className="h-3 w-3 mr-1" />
+                        <Badge key={index} variant="secondary" className="bg-blue-500/10 text-blue-600 border-blue-500/20 hover:bg-blue-500/20 transition-colors text-xs">
+                            <Code2 className="h-2.5 w-2.5 sm:h-3 sm:w-3 mr-1" />
                             {skill}
                         </Badge>
                     ))}
                     {insights.skills.frameworks.slice(0, 3).map((framework, index) => (
-                        <Badge key={`fw-${index}`} variant="secondary" className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20 hover:bg-emerald-500/20 transition-colors">
-                            <Rocket className="h-3 w-3 mr-1" />
+                        <Badge key={`fw-${index}`} variant="secondary" className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20 hover:bg-emerald-500/20 transition-colors text-xs">
+                            <Rocket className="h-2.5 w-2.5 sm:h-3 sm:w-3 mr-1" />
                             {framework}
                         </Badge>
                     ))}
                 </motion.div>
 
-                {/* Metrics Cards - Compact Version */}
+                {/* Metrics Cards - Responsive Grid */}
                 <motion.div
-                    className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8"
+                    className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, delay: 0.3 }}
                 >
                     <Card className="border-border/40 hover:border-border transition-colors hover:shadow-md">
-                        <CardContent className="p-4">
+                        <CardContent className="p-3 sm:p-4">
                             <div className="flex items-center justify-between">
-                                <div>
+                                <div className="min-w-0 flex-1">
                                     <p className="text-xs text-muted-foreground font-medium">Overall Score</p>
-                                    <p className="text-xl font-bold text-foreground">
+                                    <p className="text-lg sm:text-xl font-bold text-foreground">
                                         {insights.metrics.overallScore}
-                                        <span className="text-sm text-muted-foreground">/100</span>
+                                        <span className="text-xs sm:text-sm text-muted-foreground">/100</span>
                                     </p>
                                 </div>
-                                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                                    <Target className="h-4 w-4 text-primary" />
+                                <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                                    <Target className="h-3 w-3 sm:h-4 sm:w-4 text-primary" />
                                 </div>
                             </div>
                         </CardContent>
@@ -395,16 +462,16 @@ export default function PortfolioDetails({ username }: { username: string }) {
 
                     {insights.metrics.activityLevel && (
                         <Card className="border-border/40 hover:border-border transition-colors hover:shadow-md">
-                            <CardContent className="p-4">
+                            <CardContent className="p-3 sm:p-4">
                                 <div className="flex items-center justify-between">
-                                    <div>
+                                    <div className="min-w-0 flex-1">
                                         <p className="text-xs text-muted-foreground font-medium">Activity</p>
-                                        <p className="text-xl font-bold text-foreground">
+                                        <p className="text-lg sm:text-xl font-bold text-foreground truncate">
                                             {insights.metrics.activityLevel}
                                         </p>
                                     </div>
-                                    <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center">
-                                        <Activity className="h-4 w-4 text-emerald-500" />
+                                    <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center flex-shrink-0">
+                                        <Activity className="h-3 w-3 sm:h-4 sm:w-4 text-emerald-500" />
                                     </div>
                                 </div>
                             </CardContent>
@@ -413,16 +480,16 @@ export default function PortfolioDetails({ username }: { username: string }) {
 
                     {insights.careerPath && (
                         <Card className="border-border/40 hover:border-border transition-colors hover:shadow-md">
-                            <CardContent className="p-4">
+                            <CardContent className="p-3 sm:p-4">
                                 <div className="flex items-center justify-between">
-                                    <div>
+                                    <div className="min-w-0 flex-1">
                                         <p className="text-xs text-muted-foreground font-medium">Level</p>
-                                        <p className="text-xl font-bold text-foreground">
+                                        <p className="text-lg sm:text-xl font-bold text-foreground truncate">
                                             {insights.careerPath.currentLevel}
                                         </p>
                                     </div>
-                                    <div className="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center">
-                                        <Briefcase className="h-4 w-4 text-purple-500" />
+                                    <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg bg-purple-500/10 flex items-center justify-center flex-shrink-0">
+                                        <Briefcase className="h-3 w-3 sm:h-4 sm:w-4 text-purple-500" />
                                     </div>
                                 </div>
                             </CardContent>
@@ -431,16 +498,16 @@ export default function PortfolioDetails({ username }: { username: string }) {
 
                     {insights.metrics.collaborationScore && (
                         <Card className="border-border/40 hover:border-border transition-colors hover:shadow-md">
-                            <CardContent className="p-4">
+                            <CardContent className="p-3 sm:p-4">
                                 <div className="flex items-center justify-between">
-                                    <div>
+                                    <div className="min-w-0 flex-1">
                                         <p className="text-xs text-muted-foreground font-medium">Collab</p>
-                                        <p className="text-xl font-bold text-foreground">
+                                        <p className="text-lg sm:text-xl font-bold text-foreground">
                                             {insights.metrics.collaborationScore}
                                         </p>
                                     </div>
-                                    <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center">
-                                        <Users className="h-4 w-4 text-blue-500" />
+                                    <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg bg-blue-500/10 flex items-center justify-center flex-shrink-0">
+                                        <Users className="h-3 w-3 sm:h-4 sm:w-4 text-blue-500" />
                                     </div>
                                 </div>
                             </CardContent>
@@ -454,67 +521,69 @@ export default function PortfolioDetails({ username }: { username: string }) {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, delay: 0.4 }}
                 >
-                    <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-                        <TabsList className="grid w-full grid-cols-4 bg-muted/30 p-1 h-auto">
-                            <TabsTrigger 
-                                value="overview" 
-                                className="data-[state=active]:bg-background data-[state=active]:shadow-sm py-2.5 text-sm font-medium"
+                    <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4 sm:space-y-6">
+                        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 bg-muted/30 p-1 h-auto">
+                            <TabsTrigger
+                                value="overview"
+                                className="data-[state=active]:bg-background data-[state=active]:shadow-sm py-2 sm:py-2.5 text-xs sm:text-sm font-medium"
                             >
-                                <Globe className="h-4 w-4 mr-2" />
-                                Overview
+                                <Globe className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                                <span className="hidden sm:inline">Overview</span>
+                                <span className="sm:hidden">Info</span>
                             </TabsTrigger>
-                            <TabsTrigger 
-                                value="skills" 
-                                className="data-[state=active]:bg-background data-[state=active]:shadow-sm py-2.5 text-sm font-medium"
+                            <TabsTrigger
+                                value="skills"
+                                className="data-[state=active]:bg-background data-[state=active]:shadow-sm py-2 sm:py-2.5 text-xs sm:text-sm font-medium"
                             >
-                                <Layers className="h-4 w-4 mr-2" />
+                                <Layers className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                                 Skills
                             </TabsTrigger>
-                            <TabsTrigger 
-                                value="insights" 
-                                className="data-[state=active]:bg-background data-[state=active]:shadow-sm py-2.5 text-sm font-medium"
+                            <TabsTrigger
+                                value="insights"
+                                className="data-[state=active]:bg-background data-[state=active]:shadow-sm py-2 sm:py-2.5 text-xs sm:text-sm font-medium"
                             >
-                                <Lightbulb className="h-4 w-4 mr-2" />
-                                Insights
+                                <Lightbulb className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                                <span className="hidden sm:inline">Insights</span>
+                                <span className="sm:hidden">AI</span>
                             </TabsTrigger>
-                            <TabsTrigger 
-                                value="career" 
-                                className="data-[state=active]:bg-background data-[state=active]:shadow-sm py-2.5 text-sm font-medium"
+                            <TabsTrigger
+                                value="career"
+                                className="data-[state=active]:bg-background data-[state=active]:shadow-sm py-2 sm:py-2.5 text-xs sm:text-sm font-medium"
                             >
-                                <TrendingUp className="h-4 w-4 mr-2" />
+                                <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                                 Career
                             </TabsTrigger>
                         </TabsList>
 
-                        <TabsContent value="overview" className="space-y-6">
-                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <TabsContent value="overview" className="space-y-4 sm:space-y-6">
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                                 <Card className="border-border/40 hover:shadow-lg transition-all duration-300">
-                                    <CardHeader className="pb-4">
-                                        <CardTitle className="flex items-center gap-3 text-lg">
-                                            <div className="w-10 h-10 rounded-lg bg-gray-500/10 flex items-center justify-center">
-                                                <Github className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+                                    <CardHeader className="pb-3 sm:pb-4">
+                                        <CardTitle className="flex items-center gap-2 sm:gap-3 text-base sm:text-lg">
+                                            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gray-500/10 flex items-center justify-center">
+                                                <Github className="h-4 w-4 sm:h-5 sm:w-5 text-gray-600 dark:text-gray-400" />
                                             </div>
                                             GitHub Analysis
                                         </CardTitle>
                                     </CardHeader>
                                     <CardContent>
-                                        <p className="text-muted-foreground text-sm leading-relaxed">
+                                        <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed">
                                             {insights.metrics.githubActivity}
                                         </p>
                                     </CardContent>
                                 </Card>
 
                                 <Card className="border-border/40 hover:shadow-lg transition-all duration-300">
-                                    <CardHeader className="pb-4">
-                                        <CardTitle className="flex items-center gap-3 text-lg">
-                                            <div className="w-10 h-10 rounded-lg bg-orange-500/10 flex items-center justify-center">
-                                                <Code2 className="h-5 w-5 text-orange-500" />
+                                    <CardHeader className="pb-3 sm:pb-4">
+                                        <CardTitle className="flex items-center gap-2 sm:gap-3 text-base sm:text-lg">
+                                            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-orange-500/10 flex items-center justify-center">
+                                                <Code2 className="h-4 w-4 sm:h-5 sm:w-5 text-orange-500" />
                                             </div>
                                             LeetCode Analysis
                                         </CardTitle>
                                     </CardHeader>
                                     <CardContent>
-                                        <p className="text-muted-foreground text-sm leading-relaxed">
+                                        <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed">
                                             {insights.metrics.codingProficiency}
                                         </p>
                                     </CardContent>
@@ -522,19 +591,19 @@ export default function PortfolioDetails({ username }: { username: string }) {
                             </div>
                         </TabsContent>
 
-                        <TabsContent value="skills" className="space-y-6">
-                            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-6">
+                        <TabsContent value="skills" className="space-y-4 sm:space-y-6">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                                 <Card className="border-border/40 hover:shadow-lg transition-all duration-300">
-                                    <CardHeader className="pb-4">
-                                        <CardTitle className="flex items-center gap-3 text-lg">
-                                            <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center">
-                                                <Code2 className="h-5 w-5 text-blue-500" />
+                                    <CardHeader className="pb-3 sm:pb-4">
+                                        <CardTitle className="flex items-center gap-2 sm:gap-3 text-base sm:text-lg">
+                                            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-blue-500/10 flex items-center justify-center">
+                                                <Code2 className="h-4 w-4 sm:h-5 sm:w-5 text-blue-500" />
                                             </div>
                                             Languages
                                         </CardTitle>
                                     </CardHeader>
                                     <CardContent>
-                                        <div className="flex flex-wrap gap-2">
+                                        <div className="flex flex-wrap gap-1.5 sm:gap-2">
                                             {insights.skills.languages.map((lang, i) => (
                                                 <Badge key={i} variant="secondary" className="bg-blue-500/10 text-blue-600 border-blue-500/20 hover:bg-blue-500/20 transition-colors text-xs">
                                                     {lang}
@@ -545,16 +614,16 @@ export default function PortfolioDetails({ username }: { username: string }) {
                                 </Card>
 
                                 <Card className="border-border/40 hover:shadow-lg transition-all duration-300">
-                                    <CardHeader className="pb-4">
-                                        <CardTitle className="flex items-center gap-3 text-lg">
-                                            <div className="w-10 h-10 rounded-lg bg-emerald-500/10 flex items-center justify-center">
-                                                <Rocket className="h-5 w-5 text-emerald-500" />
+                                    <CardHeader className="pb-3 sm:pb-4">
+                                        <CardTitle className="flex items-center gap-2 sm:gap-3 text-base sm:text-lg">
+                                            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+                                                <Rocket className="h-4 w-4 sm:h-5 sm:w-5 text-emerald-500" />
                                             </div>
                                             Frameworks
                                         </CardTitle>
                                     </CardHeader>
                                     <CardContent>
-                                        <div className="flex flex-wrap gap-2">
+                                        <div className="flex flex-wrap gap-1.5 sm:gap-2">
                                             {insights.skills.frameworks.map((framework, i) => (
                                                 <Badge key={i} variant="secondary" className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20 hover:bg-emerald-500/20 transition-colors text-xs">
                                                     {framework}
@@ -565,16 +634,16 @@ export default function PortfolioDetails({ username }: { username: string }) {
                                 </Card>
 
                                 <Card className="border-border/40 hover:shadow-lg transition-all duration-300">
-                                    <CardHeader className="pb-4">
-                                        <CardTitle className="flex items-center gap-3 text-lg">
-                                            <div className="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center">
-                                                <Sparkles className="h-5 w-5 text-purple-500" />
+                                    <CardHeader className="pb-3 sm:pb-4">
+                                        <CardTitle className="flex items-center gap-2 sm:gap-3 text-base sm:text-lg">
+                                            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-purple-500/10 flex items-center justify-center">
+                                                <Sparkles className="h-4 w-4 sm:h-5 sm:w-5 text-purple-500" />
                                             </div>
                                             Tools
                                         </CardTitle>
                                     </CardHeader>
                                     <CardContent>
-                                        <div className="flex flex-wrap gap-2">
+                                        <div className="flex flex-wrap gap-1.5 sm:gap-2">
                                             {insights.skills.tools.map((tool, i) => (
                                                 <Badge key={i} variant="secondary" className="bg-purple-500/10 text-purple-600 border-purple-500/20 hover:bg-purple-500/20 transition-colors text-xs">
                                                     {tool}
@@ -586,16 +655,16 @@ export default function PortfolioDetails({ username }: { username: string }) {
 
                                 {insights.skills.specializations && (
                                     <Card className="border-border/40 hover:shadow-lg transition-all duration-300">
-                                        <CardHeader className="pb-4">
-                                            <CardTitle className="flex items-center gap-3 text-lg">
-                                                <div className="w-10 h-10 rounded-lg bg-amber-500/10 flex items-center justify-center">
-                                                    <Award className="h-5 w-5 text-amber-500" />
+                                        <CardHeader className="pb-3 sm:pb-4">
+                                            <CardTitle className="flex items-center gap-2 sm:gap-3 text-base sm:text-lg">
+                                                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-amber-500/10 flex items-center justify-center">
+                                                    <Award className="h-4 w-4 sm:h-5 sm:w-5 text-amber-500" />
                                                 </div>
                                                 Specializations
                                             </CardTitle>
                                         </CardHeader>
                                         <CardContent>
-                                            <div className="flex flex-wrap gap-2">
+                                            <div className="flex flex-wrap gap-1.5 sm:gap-2">
                                                 {insights.skills.specializations.map((spec, i) => (
                                                     <Badge key={i} variant="secondary" className="bg-amber-500/10 text-amber-600 border-amber-500/20 hover:bg-amber-500/20 transition-colors text-xs">
                                                         {spec}
@@ -608,7 +677,7 @@ export default function PortfolioDetails({ username }: { username: string }) {
                             </div>
                         </TabsContent>
 
-                        <TabsContent value="insights" className="space-y-6">
+                        <TabsContent value="insights" className="space-y-4 sm:space-y-6">
                             <Card className="border-border/40 hover:shadow-lg transition-all duration-300">
                                 <CardHeader className="pb-4">
                                     <CardTitle className="flex items-center gap-3 text-lg">
@@ -755,8 +824,8 @@ export default function PortfolioDetails({ username }: { username: string }) {
                                                     </h4>
                                                     <div className="space-y-3">
                                                         {insights.careerPath.nextSteps.map((step, i) => (
-                                                            <motion.div 
-                                                                key={i} 
+                                                            <motion.div
+                                                                key={i}
                                                                 className="flex items-start gap-3 p-4 bg-muted/30 rounded-lg border border-border/40 hover:border-border transition-colors"
                                                                 initial={{ opacity: 0, y: 10 }}
                                                                 animate={{ opacity: 1, y: 0 }}
@@ -1021,7 +1090,9 @@ export default function PortfolioDetails({ username }: { username: string }) {
                                 <DialogHeader>
                                     <DialogTitle className="text-xl flex items-center gap-2 text-emerald-600">
                                         <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center">
-                                            <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                                            <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+                                                <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                                            </div>
                                         </div>
                                         Welcome to the Waitlist!
                                     </DialogTitle>
@@ -1047,6 +1118,177 @@ export default function PortfolioDetails({ username }: { username: string }) {
                                 </DialogFooter>
                             </>
                         )}
+                    </DialogContent>
+                </Dialog>
+
+                {/* Card Generation Dialog */}
+                <Dialog open={cardDialogOpen} onOpenChange={setCardDialogOpen}>
+                    <DialogContent className="sm:max-w-2xl">
+                        <DialogHeader>
+                            <DialogTitle className="text-xl flex items-center gap-2">
+                                <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-purple-500/20 to-pink-500/20 flex items-center justify-center">
+                                    <ImageIcon className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+                                </div>
+                                Create Portfolio Card
+                            </DialogTitle>
+                            <DialogDescription className="text-muted-foreground">
+                                Generate a beautiful, shareable card showcasing your portfolio highlights
+                            </DialogDescription>
+                        </DialogHeader>
+
+                        <div className="space-y-3">
+                            <div className="relative">
+                                <div className="bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-600 rounded-3xl p-1 shadow-2xl">
+                                    <div className="bg-gradient-to-br from-slate-900/95 via-slate-800/95 to-slate-900/95 rounded-3xl p-8 text-white overflow-hidden relative backdrop-blur-xl">
+                                        <div className="absolute inset-0 overflow-hidden">
+                                            <div className="absolute -top-10 -right-10 w-40 h-40 bg-gradient-to-br from-emerald-500/30 to-teal-500/30 rounded-full blur-3xl animate-pulse"></div>
+                                            <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-gradient-to-br from-teal-500/30 to-cyan-500/30 rounded-full blur-3xl animate-pulse delay-1000"></div>
+                                            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-24 h-24 bg-gradient-to-br from-cyan-500/20 to-emerald-500/20 rounded-full blur-2xl animate-pulse delay-500"></div>
+                                        </div>
+                                        <div className="relative z-10">
+                                            <div className="flex items-start justify-between mb-4">
+                                                <div className="flex items-center gap-6">
+                                                    <div className="relative">
+                                                        <div className="w-20 h-20 rounded-2xl overflow-hidden border-3 border-white/20 shadow-xl">
+                                                            {
+                                                                user?.imageUrl ? (
+                                                                    <img
+                                                                        src={user.imageUrl}
+                                                                        alt={user.fullName || "User"}
+                                                                        className="w-full h-full object-cover"
+                                                                    />
+                                                                ) : (
+                                                                    <div className="w-full h-full bg-gradient-to-br from-emerald-400 to-teal-400 flex items-center justify-center text-2xl font-bold">
+                                                                        {user?.fullName?.split(" ").map(n => n[0]).join("") || "U"}
+                                                                    </div>
+                                                                )
+                                                            }
+                                                        </div>
+                                                        <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-gradient-to-r from-emerald-400 to-teal-400 rounded-full flex items-center justify-center border-2 border-slate-900">
+                                                            <Shield className="h-4 w-4 text-white" />
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <h3 className="text-2xl font-bold mb-1 bg-gradient-to-r from-white to-emerald-100 bg-clip-text text-transparent">
+                                                            {user?.fullName || "Developer"}
+                                                        </h3>
+                                                        <p className="text-emerald-200 text-base font-medium">{insights?.summary.title}</p>
+                                                        <div className="flex items-center gap-2 mt-2">
+                                                            <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+                                                            <span className="text-emerald-300 text-sm font-medium">AI Verified</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div className="text-right">
+                                                    <div className="bg-gradient-to-br from-white/10 to-white/5 rounded-2xl p-4 backdrop-blur-xl border border-white/10">
+                                                        <div className="text-4xl font-bold bg-gradient-to-r from-emerald-300 to-teal-300 bg-clip-text text-transparent">
+                                                            {insights?.metrics.overallScore}
+                                                        </div>
+                                                        <div className="text-xs text-emerald-200 font-semibold tracking-wider uppercase">Portfolio Score</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="mb-4">
+                                                <h4 className="text-sm font-bold text-emerald-200 mb-4 tracking-wider uppercase">Top Skills & Technologies</h4>
+                                                <div className="grid grid-cols-3 gap-2">
+                                                    {
+                                                        insights?.skills.languages.slice(0, 6).map((skill, i) => (
+                                                            <div key={i} className="bg-gradient-to-r from-white/15 to-white/5 rounded-lg px-3 py-2 backdrop-blur-sm border border-white/10 text-center">
+                                                                <div className="flex items-center justify-center gap-1">
+                                                                    <Code2 className="h-3 w-3 text-emerald-300" />
+                                                                    <span className="text-white text-xs font-medium">{skill}</span>
+                                                                </div>
+                                                            </div>
+                                                        ))
+                                                    }
+                                                </div>
+                                            </div>
+                                            <div className="grid grid-cols-3 gap-4 mb-4">
+                                                <div className="bg-gradient-to-br from-emerald-500/20 to-teal-500/20 rounded-xl p-4 text-center backdrop-blur-sm border border-emerald-400/20">
+                                                    <div className="text-lg font-bold text-emerald-300 mb-1">
+                                                        {insights?.metrics.activityLevel || "High"}
+                                                    </div>
+                                                    <div className="text-xs text-emerald-200 font-semibold tracking-wider uppercase">Activity</div>
+                                                </div>
+                                                <div className="bg-gradient-to-br from-teal-500/20 to-cyan-500/20 rounded-xl p-4 text-center backdrop-blur-sm border border-teal-400/20">
+                                                    <div className="text-lg font-bold text-teal-300 mb-1">
+                                                        {insights?.careerPath?.currentLevel || "Mid-Level"}
+                                                    </div>
+                                                    <div className="text-xs text-teal-200 font-semibold tracking-wider uppercase">Level</div>
+                                                </div>
+                                                <div className="bg-gradient-to-br from-cyan-500/20 to-emerald-500/20 rounded-xl p-4 text-center backdrop-blur-sm border border-cyan-400/20">
+                                                    <div className="text-lg font-bold text-cyan-300 mb-1">
+                                                        {insights?.skills.languages.length || 0}+
+                                                    </div>
+                                                    <div className="text-xs text-cyan-200 font-semibold tracking-wider uppercase">Technologies</div>
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center justify-between pt-2 border-t border-white/10">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-8 h-8 bg-gradient-to-r from-emerald-400 to-teal-400 rounded-xl flex items-center justify-center shadow-lg">
+                                                        <span className="text-white text-sm font-bold">T</span>
+                                                    </div>
+                                                    <div>
+                                                        <span className="text-white text-lg font-bold">TrueFolio</span>
+                                                        <p className="text-emerald-200 text-xs">Premium Portfolio Platform</p>
+                                                    </div>
+                                                </div>
+                                                <div className="text-right">
+                                                    <div className="text-emerald-200 text-sm">
+                                                        {
+                                                            new Date().toLocaleDateString('en-US', {
+                                                                month: 'short',
+                                                                year: 'numeric'
+                                                            })
+                                                        }
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="text-sm text-muted-foreground bg-muted/30 p-4 rounded-lg border border-border/40">
+                                <p className="font-medium mb-2 text-foreground">Your card will include:</p>
+                                <ul className="list-disc list-inside space-y-1 text-xs grid grid-cols-1 md:grid-cols-2 gap-2 ">
+                                    <li>Portfolio score and key metrics</li>
+                                    <li>Top skills and technologies</li>
+                                    <li>Career level and activity status</li>
+                                    <li>AI verification badge</li>
+                                    <li>Shareable link and download options</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <DialogFooter>
+                            <Button variant="outline" onClick={() => setCardDialogOpen(false)}>
+                                Cancel
+                            </Button>
+                            <Button
+                                onClick={handleCreateCard}
+                                disabled={isGeneratingCard}
+                                className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
+                            >
+                                {isGeneratingCard ? (
+                                    <>
+                                        <motion.div
+                                            animate={{ rotate: 360 }}
+                                            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                                            className="mr-2"
+                                        >
+                                            <Sparkles className="h-4 w-4" />
+                                        </motion.div>
+                                        Generating...
+                                    </>
+                                ) : (
+                                    <>
+                                        <ImageIcon className="h-4 w-4 mr-2" />
+                                        Generate Card
+                                    </>
+                                )}
+                            </Button>
+                        </DialogFooter>
                     </DialogContent>
                 </Dialog>
             </div>
