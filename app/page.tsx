@@ -18,6 +18,8 @@ import EmployerSection from "@/components/(landingpage)/employer-section"
 import FeaturesSection from "@/components/(landingpage)/feature-section"
 import TestimonialsSection from "@/components/(landingpage)/testimonials-section"
 import CTASection from "@/components/(landingpage)/cta-section"
+import { Navbar } from "@/components/navbar"
+import { Footer } from "@/components/footer"
 
 function CustomSwitch({ value, onValueChange }: { value: boolean; onValueChange: (value: boolean) => void }) {
 	return (
@@ -51,7 +53,7 @@ function CustomSwitch({ value, onValueChange }: { value: boolean; onValueChange:
 const studentContent = {
 	title: "Let's do this.",
 	description:
-		"Transform your coding journey into a compelling story. Our AI analyzes your platforms, creates personalized action plans, and helps you showcase your true potential to employers. No more generic portfolios - stand out with real, verified achievements.",
+		"Turn your coding journey into a story. Our AI analyzes your platforms, builds personalized action plans, and highlights verified achievements — no more generic portfolios.",
 	metrics: [
 		{ label: "Success Rate", value: "85%", icon: CheckCircle },
 		{ label: "Time Optimized", value: "12hrs", icon: TrendingUp },
@@ -89,6 +91,7 @@ export default function LandingPage() {
 
 	return (
 		<SmoothScroll>
+			<Navbar />
 			<div className="w-full">
 				<section className="relative min-h-screen bg-white dark:bg-black overflow-hidden flex items-center">
 					<Spotlight />
@@ -345,6 +348,7 @@ export default function LandingPage() {
 				<TestimonialsSection />
 				<CTASection SignUpButton={SignUpButton} />
 			</div>
+			<Footer />
 		</SmoothScroll>
 	)
 }

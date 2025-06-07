@@ -2,8 +2,6 @@ import { ClerkProvider } from "@clerk/nextjs"
 import { type Metadata } from "next"
 import { Geist, Geist_Mono, Inter, Space_Grotesk } from "next/font/google"
 import "./globals.css"
-import { Navbar } from "@/components/navbar";
-import { Footer } from "@/components/footer";
 import { ThemeProvider } from "@/components/themeprovider"
 import { Toaster } from "@/components/ui/sonner"
 
@@ -45,12 +43,8 @@ export default function RootLayout({
 						enableSystem
 						disableTransitionOnChange
 					>
-						<Navbar />
-						<section className="">
-							{children}
-							<Toaster />
-						</section>
-						<Footer />
+						{children}
+						<Toaster />
 					</ThemeProvider>
 				</body>
 			</html>
