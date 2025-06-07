@@ -1,10 +1,8 @@
 "use server";
 
 import { auth } from "@clerk/nextjs/server";
-import { PrismaClient } from "@/lib/generated/prisma";
+import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-
-const prisma = new PrismaClient();
 
 interface CreateCardData {
     title: string;

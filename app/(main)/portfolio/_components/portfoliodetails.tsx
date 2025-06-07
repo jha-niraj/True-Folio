@@ -18,7 +18,7 @@ import {
     Copy, RefreshCw, Github, Code2, Linkedin, Twitter, FileText, Mail, ExternalLink, Award,
     TrendingUp, Sparkles, Target, ArrowRight, Briefcase, Brain, CheckCircle2, Zap, CreditCard,
     User, Calendar, DollarSign, Activity, Users, Trophy, Lightbulb, Rocket, Star, Layers,
-    BarChart3, GitBranch, Shield, Clock, Globe, ImageIcon, Share, Download
+    BarChart3, GitBranch, Shield, Clock, Globe, ImageIcon, Share, Download, Plus, Code
 } from "lucide-react"
 import { generatePortfolioInsights, forceRefreshPortfolioInsights } from "@/actions/platform.action"
 import { createPortfolioCard } from "@/actions/card.action"
@@ -36,14 +36,24 @@ interface PortfolioInsights {
         specializations?: string[]
     }
     insights: {
-        strengths: string[]
-        improvements: string[]
-        recommendations: string[]
-        projectHighlights?: string[]
+        code: {
+            strengths: string[]
+            improvements: string[]
+            recommendations: string[]
+            projectHighlights?: string[]
+        }
+        social: {
+            strengths: string[]
+            improvements: string[]
+            recommendations: string[]
+            highlights?: string[]
+        }
     }
     metrics: {
         githubActivity: string
         codingProficiency: string
+        professionalPresence?: string
+        socialEngagement?: string
         overallScore: string
         activityLevel?: string
         collaborationScore?: string
@@ -53,6 +63,11 @@ interface PortfolioInsights {
         nextSteps: string[]
         roleRecommendations: string[]
         salaryRange: string
+    }
+    platformData?: {
+        connectedPlatforms: string[]
+        codeScore: string
+        socialScore: string
     }
     // New properties for caching
     _cached?: boolean
@@ -198,7 +213,7 @@ export default function PortfolioDetails({ username }: { username: string }) {
                     languages: insights?.skills.languages.slice(0, 6) || [],
                     frameworks: insights?.skills.frameworks.slice(0, 4) || []
                 },
-                highlights: insights?.insights.strengths.slice(0, 3) || [],
+                highlights: insights?.insights.code?.strengths.slice(0, 3) || [],
                 careerLevel: insights?.careerPath?.currentLevel || "Developer",
                 userName: user?.fullName || "Developer",
                 userAvatar: user?.imageUrl || ""
@@ -403,6 +418,15 @@ export default function PortfolioDetails({ username }: { username: string }) {
                             <Button
                                 variant="outline"
                                 size="sm"
+                                onClick={() => window.location.href = "/details"}
+                                className="flex-1 sm:flex-none hover:bg-primary/5 bg-gradient-to-r from-green-500/10 to-emerald-500/10 border-green-500/20 text-green-600 dark:text-green-400"
+                            >
+                                <Plus className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
+                                Add Platforms
+                            </Button>
+                            <Button
+                                variant="outline"
+                                size="sm"
                                 onClick={handleRefresh}
                                 disabled={isRefreshing}
                                 className="flex-1 sm:flex-none hover:bg-primary/5"
@@ -539,11 +563,11 @@ export default function PortfolioDetails({ username }: { username: string }) {
                                 Skills
                             </TabsTrigger>
                             <TabsTrigger
-                                value="insights"
+                                value="platforms"
                                 className="data-[state=active]:bg-background data-[state=active]:shadow-sm py-2 sm:py-2.5 text-xs sm:text-sm font-medium"
                             >
                                 <Lightbulb className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-                                <span className="hidden sm:inline">Insights</span>
+                                <span className="hidden sm:inline">Platforms</span>
                                 <span className="sm:hidden">AI</span>
                             </TabsTrigger>
                             <TabsTrigger
@@ -677,127 +701,287 @@ export default function PortfolioDetails({ username }: { username: string }) {
                             </div>
                         </TabsContent>
 
-                        <TabsContent value="insights" className="space-y-4 sm:space-y-6">
+                        <TabsContent value="platforms" className="space-y-4 sm:space-y-6">
                             <Card className="border-border/40 hover:shadow-lg transition-all duration-300">
                                 <CardHeader className="pb-4">
                                     <CardTitle className="flex items-center gap-3 text-lg">
                                         <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
                                             <Lightbulb className="h-5 w-5 text-primary" />
                                         </div>
-                                        AI Insights & Analysis
+                                        Platform Insights & Analysis
                                     </CardTitle>
                                     <CardDescription className="text-muted-foreground">
-                                        Comprehensive analysis of your coding profile and growth opportunities
+                                        AI-powered insights categorized by platform type
                                     </CardDescription>
                                 </CardHeader>
                                 <CardContent>
-                                    <Tabs defaultValue="strengths" className="w-full">
-                                        <TabsList className="grid w-full grid-cols-4 bg-muted/30 p-1 h-auto">
-                                            <TabsTrigger value="strengths" className="text-xs data-[state=active]:bg-background data-[state=active]:shadow-sm py-2">
-                                                <Star className="h-3 w-3 mr-1" />
-                                                Strengths
+                                    <Tabs defaultValue="code" className="w-full">
+                                        <TabsList className="grid w-full grid-cols-2 bg-muted/30 p-1 h-auto">
+                                            <TabsTrigger value="code" className="text-xs data-[state=active]:bg-background data-[state=active]:shadow-sm py-2">
+                                                <Code className="h-3 w-3 mr-1" />
+                                                Code Platforms
                                             </TabsTrigger>
-                                            <TabsTrigger value="improvements" className="text-xs data-[state=active]:bg-background data-[state=active]:shadow-sm py-2">
-                                                <TrendingUp className="h-3 w-3 mr-1" />
-                                                Growth
+                                            <TabsTrigger value="social" className="text-xs data-[state=active]:bg-background data-[state=active]:shadow-sm py-2">
+                                                <Users className="h-3 w-3 mr-1" />
+                                                Social Platforms
                                             </TabsTrigger>
-                                            <TabsTrigger value="recommendations" className="text-xs data-[state=active]:bg-background data-[state=active]:shadow-sm py-2">
-                                                <Rocket className="h-3 w-3 mr-1" />
-                                                Tips
-                                            </TabsTrigger>
-                                            {insights.insights.projectHighlights && (
-                                                <TabsTrigger value="projects" className="text-xs data-[state=active]:bg-background data-[state=active]:shadow-sm py-2">
-                                                    <FileText className="h-3 w-3 mr-1" />
-                                                    Projects
-                                                </TabsTrigger>
-                                            )}
                                         </TabsList>
 
-                                        <TabsContent value="strengths" className="mt-6">
-                                            <div className="space-y-3">
-                                                {insights.insights.strengths.map((strength, i) => (
-                                                    <motion.div
-                                                        key={i}
-                                                        initial={{ opacity: 0, x: -20 }}
-                                                        animate={{ opacity: 1, x: 0 }}
-                                                        transition={{ delay: i * 0.1 }}
-                                                        className="flex items-start gap-3 p-4 rounded-lg bg-emerald-500/5 dark:bg-emerald-500/10 border border-emerald-500/20"
-                                                    >
-                                                        <div className="w-6 h-6 rounded-full bg-emerald-500/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                                                            <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-                                                        </div>
-                                                        <span className="text-foreground text-sm leading-relaxed">
-                                                            {strength}
-                                                        </span>
-                                                    </motion.div>
-                                                ))}
-                                            </div>
-                                        </TabsContent>
+                                        <TabsContent value="code" className="mt-6">
+                                            {(insights.insights.code || insights.metrics.githubActivity || insights.metrics.codingProficiency) ? (
+                                                <Tabs defaultValue="strengths" className="w-full">
+                                                    <TabsList className="grid w-full grid-cols-4 bg-muted/30 p-1 h-auto">
+                                                        <TabsTrigger value="strengths" className="text-xs data-[state=active]:bg-background data-[state=active]:shadow-sm py-2">
+                                                            <Star className="h-3 w-3 mr-1" />
+                                                            Strengths
+                                                        </TabsTrigger>
+                                                        <TabsTrigger value="improvements" className="text-xs data-[state=active]:bg-background data-[state=active]:shadow-sm py-2">
+                                                            <TrendingUp className="h-3 w-3 mr-1" />
+                                                            Growth
+                                                        </TabsTrigger>
+                                                        <TabsTrigger value="recommendations" className="text-xs data-[state=active]:bg-background data-[state=active]:shadow-sm py-2">
+                                                            <Rocket className="h-3 w-3 mr-1" />
+                                                            Tips
+                                                        </TabsTrigger>
+                                                        {(insights.insights.code?.projectHighlights || (insights.insights as any).projectHighlights) && (
+                                                            <TabsTrigger value="projects" className="text-xs data-[state=active]:bg-background data-[state=active]:shadow-sm py-2">
+                                                                <FileText className="h-3 w-3 mr-1" />
+                                                                Projects
+                                                            </TabsTrigger>
+                                                        )}
+                                                    </TabsList>
 
-                                        <TabsContent value="improvements" className="mt-6">
-                                            <div className="space-y-3">
-                                                {insights.insights.improvements.map((improvement, i) => (
-                                                    <motion.div
-                                                        key={i}
-                                                        initial={{ opacity: 0, x: -20 }}
-                                                        animate={{ opacity: 1, x: 0 }}
-                                                        transition={{ delay: i * 0.1 }}
-                                                        className="flex items-start gap-3 p-4 rounded-lg bg-amber-500/5 dark:bg-amber-500/10 border border-amber-500/20"
-                                                    >
-                                                        <div className="w-6 h-6 rounded-full bg-amber-500/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                                                            <TrendingUp className="h-4 w-4 text-amber-500" />
+                                                    <TabsContent value="strengths" className="mt-6">
+                                                        <div className="space-y-3">
+                                                            {(insights.insights.code?.strengths || (insights.insights as any).strengths || []).map((strength: string, i: number) => (
+                                                                <motion.div
+                                                                    key={i}
+                                                                    initial={{ opacity: 0, x: -20 }}
+                                                                    animate={{ opacity: 1, x: 0 }}
+                                                                    transition={{ delay: i * 0.1 }}
+                                                                    className="flex items-start gap-3 p-4 rounded-lg bg-emerald-500/5 dark:bg-emerald-500/10 border border-emerald-500/20"
+                                                                >
+                                                                    <div className="w-6 h-6 rounded-full bg-emerald-500/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                                                        <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                                                                    </div>
+                                                                    <span className="text-foreground text-sm leading-relaxed">
+                                                                        {strength}
+                                                                    </span>
+                                                                </motion.div>
+                                                            ))}
                                                         </div>
-                                                        <span className="text-foreground text-sm leading-relaxed">
-                                                            {improvement}
-                                                        </span>
-                                                    </motion.div>
-                                                ))}
-                                            </div>
-                                        </TabsContent>
+                                                    </TabsContent>
 
-                                        <TabsContent value="recommendations" className="mt-6">
-                                            <div className="space-y-3">
-                                                {insights.insights.recommendations.map((recommendation, i) => (
-                                                    <motion.div
-                                                        key={i}
-                                                        initial={{ opacity: 0, x: -20 }}
-                                                        animate={{ opacity: 1, x: 0 }}
-                                                        transition={{ delay: i * 0.1 }}
-                                                        className="flex items-start gap-3 p-4 rounded-lg bg-purple-500/5 dark:bg-purple-500/10 border border-purple-500/20"
-                                                    >
-                                                        <div className="w-6 h-6 rounded-full bg-purple-500/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                                                            <Rocket className="h-4 w-4 text-purple-500" />
+                                                    <TabsContent value="improvements" className="mt-6">
+                                                        <div className="space-y-3">
+                                                            {(insights.insights.code?.improvements || (insights.insights as any).improvements || []).map((improvement: string, i: number) => (
+                                                                <motion.div
+                                                                    key={i}
+                                                                    initial={{ opacity: 0, x: -20 }}
+                                                                    animate={{ opacity: 1, x: 0 }}
+                                                                    transition={{ delay: i * 0.1 }}
+                                                                    className="flex items-start gap-3 p-4 rounded-lg bg-amber-500/5 dark:bg-amber-500/10 border border-amber-500/20"
+                                                                >
+                                                                    <div className="w-6 h-6 rounded-full bg-amber-500/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                                                        <TrendingUp className="h-4 w-4 text-amber-500" />
+                                                                    </div>
+                                                                    <span className="text-foreground text-sm leading-relaxed">
+                                                                        {improvement}
+                                                                    </span>
+                                                                </motion.div>
+                                                            ))}
                                                         </div>
-                                                        <span className="text-foreground text-sm leading-relaxed">
-                                                            {recommendation}
-                                                        </span>
-                                                    </motion.div>
-                                                ))}
-                                            </div>
-                                        </TabsContent>
+                                                    </TabsContent>
 
-                                        {insights.insights.projectHighlights && (
-                                            <TabsContent value="projects" className="mt-6">
-                                                <div className="space-y-3">
-                                                    {insights.insights.projectHighlights.map((project, i) => (
-                                                        <motion.div
-                                                            key={i}
-                                                            initial={{ opacity: 0, x: -20 }}
-                                                            animate={{ opacity: 1, x: 0 }}
-                                                            transition={{ delay: i * 0.1 }}
-                                                            className="flex items-start gap-3 p-4 rounded-lg bg-blue-500/5 dark:bg-blue-500/10 border border-blue-500/20"
-                                                        >
-                                                            <div className="w-6 h-6 rounded-full bg-blue-500/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                                                                <FileText className="h-4 w-4 text-blue-500" />
+                                                    <TabsContent value="recommendations" className="mt-6">
+                                                        <div className="space-y-3">
+                                                            {(insights.insights.code?.recommendations || (insights.insights as any).recommendations || []).map((recommendation: string, i: number) => (
+                                                                <motion.div
+                                                                    key={i}
+                                                                    initial={{ opacity: 0, x: -20 }}
+                                                                    animate={{ opacity: 1, x: 0 }}
+                                                                    transition={{ delay: i * 0.1 }}
+                                                                    className="flex items-start gap-3 p-4 rounded-lg bg-purple-500/5 dark:bg-purple-500/10 border border-purple-500/20"
+                                                                >
+                                                                    <div className="w-6 h-6 rounded-full bg-purple-500/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                                                        <Rocket className="h-4 w-4 text-purple-500" />
+                                                                    </div>
+                                                                    <span className="text-foreground text-sm leading-relaxed">
+                                                                        {recommendation}
+                                                                    </span>
+                                                                </motion.div>
+                                                            ))}
+                                                        </div>
+                                                    </TabsContent>
+
+                                                    {(insights.insights.code?.projectHighlights || (insights.insights as any).projectHighlights) && (
+                                                        <TabsContent value="projects" className="mt-6">
+                                                            <div className="space-y-3">
+                                                                {(insights.insights.code?.projectHighlights || (insights.insights as any).projectHighlights || []).map((project: string, i: number) => (
+                                                                    <motion.div
+                                                                        key={i}
+                                                                        initial={{ opacity: 0, x: -20 }}
+                                                                        animate={{ opacity: 1, x: 0 }}
+                                                                        transition={{ delay: i * 0.1 }}
+                                                                        className="flex items-start gap-3 p-4 rounded-lg bg-blue-500/5 dark:bg-blue-500/10 border border-blue-500/20"
+                                                                    >
+                                                                        <div className="w-6 h-6 rounded-full bg-blue-500/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                                                            <FileText className="h-4 w-4 text-blue-500" />
+                                                                        </div>
+                                                                        <span className="text-foreground text-sm leading-relaxed">
+                                                                            {project}
+                                                                        </span>
+                                                                    </motion.div>
+                                                                ))}
                                                             </div>
-                                                            <span className="text-foreground text-sm leading-relaxed">
-                                                                {project}
-                                                            </span>
-                                                        </motion.div>
-                                                    ))}
+                                                        </TabsContent>
+                                                    )}
+                                                </Tabs>
+                                            ) : (
+                                                <div className="text-center py-12">
+                                                    <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                                                        <Code className="h-8 w-8 text-gray-400" />
+                                                    </div>
+                                                    <h3 className="text-lg font-semibold text-foreground mb-2">No Code Platforms Connected</h3>
+                                                    <p className="text-muted-foreground mb-4">Connect GitHub or LeetCode to see coding insights</p>
+                                                    <Button
+                                                        onClick={() => window.location.href = "/details"}
+                                                        className="bg-primary hover:bg-primary/90"
+                                                    >
+                                                        <Plus className="h-4 w-4 mr-2" />
+                                                        Connect Platforms
+                                                    </Button>
                                                 </div>
-                                            </TabsContent>
-                                        )}
+                                            )}
+                                        </TabsContent>
+
+                                        <TabsContent value="social" className="mt-6">
+                                            {insights.insights.social ? (
+                                                <Tabs defaultValue="strengths" className="w-full">
+                                                    <TabsList className="grid w-full grid-cols-4 bg-muted/30 p-1 h-auto">
+                                                        <TabsTrigger value="strengths" className="text-xs data-[state=active]:bg-background data-[state=active]:shadow-sm py-2">
+                                                            <Star className="h-3 w-3 mr-1" />
+                                                            Strengths
+                                                        </TabsTrigger>
+                                                        <TabsTrigger value="improvements" className="text-xs data-[state=active]:bg-background data-[state=active]:shadow-sm py-2">
+                                                            <TrendingUp className="h-3 w-3 mr-1" />
+                                                            Growth
+                                                        </TabsTrigger>
+                                                        <TabsTrigger value="recommendations" className="text-xs data-[state=active]:bg-background data-[state=active]:shadow-sm py-2">
+                                                            <Rocket className="h-3 w-3 mr-1" />
+                                                            Tips
+                                                        </TabsTrigger>
+                                                        {insights.insights.social.highlights && (
+                                                            <TabsTrigger value="highlights" className="text-xs data-[state=active]:bg-background data-[state=active]:shadow-sm py-2">
+                                                                <Trophy className="h-3 w-3 mr-1" />
+                                                                Highlights
+                                                            </TabsTrigger>
+                                                        )}
+                                                    </TabsList>
+
+                                                    <TabsContent value="strengths" className="mt-6">
+                                                        <div className="space-y-3">
+                                                            {insights.insights.social.strengths.map((strength: string, i: number) => (
+                                                                <motion.div
+                                                                    key={i}
+                                                                    initial={{ opacity: 0, x: -20 }}
+                                                                    animate={{ opacity: 1, x: 0 }}
+                                                                    transition={{ delay: i * 0.1 }}
+                                                                    className="flex items-start gap-3 p-4 rounded-lg bg-emerald-500/5 dark:bg-emerald-500/10 border border-emerald-500/20"
+                                                                >
+                                                                    <div className="w-6 h-6 rounded-full bg-emerald-500/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                                                        <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                                                                    </div>
+                                                                    <span className="text-foreground text-sm leading-relaxed">
+                                                                        {strength}
+                                                                    </span>
+                                                                </motion.div>
+                                                            ))}
+                                                        </div>
+                                                    </TabsContent>
+
+                                                    <TabsContent value="improvements" className="mt-6">
+                                                        <div className="space-y-3">
+                                                            {insights.insights.social.improvements.map((improvement: string, i: number) => (
+                                                                <motion.div
+                                                                    key={i}
+                                                                    initial={{ opacity: 0, x: -20 }}
+                                                                    animate={{ opacity: 1, x: 0 }}
+                                                                    transition={{ delay: i * 0.1 }}
+                                                                    className="flex items-start gap-3 p-4 rounded-lg bg-amber-500/5 dark:bg-amber-500/10 border border-amber-500/20"
+                                                                >
+                                                                    <div className="w-6 h-6 rounded-full bg-amber-500/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                                                        <TrendingUp className="h-4 w-4 text-amber-500" />
+                                                                    </div>
+                                                                    <span className="text-foreground text-sm leading-relaxed">
+                                                                        {improvement}
+                                                                    </span>
+                                                                </motion.div>
+                                                            ))}
+                                                        </div>
+                                                    </TabsContent>
+
+                                                    <TabsContent value="recommendations" className="mt-6">
+                                                        <div className="space-y-3">
+                                                            {insights.insights.social.recommendations.map((recommendation: string, i: number) => (
+                                                                <motion.div
+                                                                    key={i}
+                                                                    initial={{ opacity: 0, x: -20 }}
+                                                                    animate={{ opacity: 1, x: 0 }}
+                                                                    transition={{ delay: i * 0.1 }}
+                                                                    className="flex items-start gap-3 p-4 rounded-lg bg-purple-500/5 dark:bg-purple-500/10 border border-purple-500/20"
+                                                                >
+                                                                    <div className="w-6 h-6 rounded-full bg-purple-500/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                                                        <Rocket className="h-4 w-4 text-purple-500" />
+                                                                    </div>
+                                                                    <span className="text-foreground text-sm leading-relaxed">
+                                                                        {recommendation}
+                                                                    </span>
+                                                                </motion.div>
+                                                            ))}
+                                                        </div>
+                                                    </TabsContent>
+
+                                                    {insights.insights.social.highlights && (
+                                                        <TabsContent value="highlights" className="mt-6">
+                                                            <div className="space-y-3">
+                                                                {insights.insights.social.highlights.map((highlight: string, i: number) => (
+                                                                    <motion.div
+                                                                        key={i}
+                                                                        initial={{ opacity: 0, x: -20 }}
+                                                                        animate={{ opacity: 1, x: 0 }}
+                                                                        transition={{ delay: i * 0.1 }}
+                                                                        className="flex items-start gap-3 p-4 rounded-lg bg-blue-500/5 dark:bg-blue-500/10 border border-blue-500/20"
+                                                                    >
+                                                                        <div className="w-6 h-6 rounded-full bg-blue-500/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                                                            <Trophy className="h-4 w-4 text-blue-500" />
+                                                                        </div>
+                                                                        <span className="text-foreground text-sm leading-relaxed">
+                                                                            {highlight}
+                                                                        </span>
+                                                                    </motion.div>
+                                                                ))}
+                                                            </div>
+                                                        </TabsContent>
+                                                    )}
+                                                </Tabs>
+                                            ) : (
+                                                <div className="text-center py-12">
+                                                    <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                                                        <Users className="h-8 w-8 text-gray-400" />
+                                                    </div>
+                                                    <h3 className="text-lg font-semibold text-foreground mb-2">No Social Platforms Connected</h3>
+                                                    <p className="text-muted-foreground mb-4">Connect LinkedIn or Twitter to see social insights</p>
+                                                    <Button
+                                                        onClick={() => window.location.href = "/details"}
+                                                        className="bg-primary hover:bg-primary/90"
+                                                    >
+                                                        <Plus className="h-4 w-4 mr-2" />
+                                                        Connect Platforms
+                                                    </Button>
+                                                </div>
+                                            )}
+                                        </TabsContent>
                                     </Tabs>
                                 </CardContent>
                             </Card>

@@ -4,6 +4,8 @@ import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { validateGithubProfile, fetchGithubData } from "@/lib/utils/github";
 import { validateLeetCodeProfile, fetchLeetCodeData } from "@/lib/utils/leetcode";
+import { validateLinkedInProfile, fetchLinkedInData } from "@/lib/utils/linkedin";
+import { validateTwitterProfile, fetchTwitterData } from "@/lib/utils/twitter";
 import { PlatformType } from "@/lib/generated/prisma";
 
 export async function validatePlatformUrl(type: PlatformType, url: string) {
@@ -12,6 +14,10 @@ export async function validatePlatformUrl(type: PlatformType, url: string) {
 			return await validateGithubProfile(url);
 		case PlatformType.LEETCODE:
 			return await validateLeetCodeProfile(url);
+		case PlatformType.LINKEDIN:
+			return await validateLinkedInProfile(url);
+		case PlatformType.TWITTER:
+			return await validateTwitterProfile(url);
 		default:
 			return null;
 	}
@@ -43,6 +49,12 @@ export async function savePlatformData(type: PlatformType, url: string) {
 			case PlatformType.LEETCODE:
 				platformData = await fetchLeetCodeData(username);
 				break;
+			case PlatformType.LINKEDIN:
+				platformData = await fetchLinkedInData(username);
+				break;
+			case PlatformType.TWITTER:
+				platformData = await fetchTwitterData(username);
+				break;
 			default:
 				throw new Error('Unsupported platform');
 		}
@@ -52,7 +64,7 @@ export async function savePlatformData(type: PlatformType, url: string) {
 			where: {
 				userId_type: {
 					userId: user.id,
-					type,
+					type: type,
 				},
 			},
 			update: {
@@ -63,7 +75,7 @@ export async function savePlatformData(type: PlatformType, url: string) {
 			},
 			create: {
 				userId: user.id,
-				type,
+				type: type,
 				username,
 				profileUrl: url,
 				data: platformData,
@@ -157,16 +169,22 @@ export async function generatePortfolioInsights(userId: string) {
 		// Prepare data for Sarvam AI
 		const githubData = platforms.find(p => p.type === PlatformType.GITHUB)?.data;
 		const leetcodeData = platforms.find(p => p.type === PlatformType.LEETCODE)?.data;
+		const linkedinData = platforms.find(p => p.type === PlatformType.LINKEDIN)?.data;
+		const twitterData = platforms.find(p => p.type === PlatformType.TWITTER)?.data;
 
 		console.log('🔍 Platform data analysis:', {
 			hasGithubData: !!githubData,
 			hasLeetcodeData: !!leetcodeData,
+			hasLinkedinData: !!linkedinData,
+			hasTwitterData: !!twitterData,
 			githubDataKeys: githubData ? Object.keys(githubData as any) : [],
-			leetcodeDataKeys: leetcodeData ? Object.keys(leetcodeData as any) : []
+			leetcodeDataKeys: leetcodeData ? Object.keys(leetcodeData as any) : [],
+			linkedinDataKeys: linkedinData ? Object.keys(linkedinData as any) : [],
+			twitterDataKeys: twitterData ? Object.keys(twitterData as any) : []
 		});
 
 		const prompt = `
-You are an expert technical recruiter and software engineering career advisor. Analyze the following developer profile data and provide detailed insights in JSON format.
+You are an expert technical recruiter and software engineering career advisor. Analyze the following developer profile data from multiple platforms and provide detailed insights in JSON format.
 
 IMPORTANT: Respond ONLY with valid JSON, no additional text or explanations.
 
@@ -184,14 +202,24 @@ Expected JSON structure:
     "specializations": ["Areas of expertise like 'Data Structures', 'System Design', 'Web Development']"
   },
   "insights": {
-    "strengths": ["4-5 specific technical strengths with details"],
-    "improvements": ["3-4 constructive areas for growth"],
-    "recommendations": ["4-5 actionable career recommendations"],
-    "projectHighlights": ["2-3 notable projects or achievements"]
+    "code": {
+      "strengths": ["4-5 specific technical coding strengths with details"],
+      "improvements": ["3-4 constructive areas for coding growth"],
+      "recommendations": ["4-5 actionable coding recommendations"],
+      "projectHighlights": ["2-3 notable projects or achievements"]
+    },
+    "social": {
+      "strengths": ["3-4 social media and networking strengths"],
+      "improvements": ["3-4 areas for social media improvement"],
+      "recommendations": ["4-5 actionable social media recommendations"],
+      "highlights": ["2-3 notable social media achievements or content"]
+    }
   },
   "metrics": {
     "githubActivity": "Detailed analysis of GitHub activity including repos, commits, collaboration",
     "codingProficiency": "Analysis of LeetCode performance including problem-solving patterns",
+    "professionalPresence": "Analysis of LinkedIn professional networking and content",
+    "socialEngagement": "Analysis of Twitter engagement and tech community involvement",
     "overallScore": "Numerical score out of 100",
     "activityLevel": "High/Medium/Low based on recent activity",
     "collaborationScore": "Assessment of teamwork and open source contributions"
@@ -201,13 +229,21 @@ Expected JSON structure:
     "nextSteps": ["3-4 specific next career steps"],
     "roleRecommendations": ["3-4 suitable job roles"],
     "salaryRange": "Estimated salary range based on skills and experience"
+  },
+  "platformData": {
+    "connectedPlatforms": ["List of connected platforms"],
+    "codeScore": "Score based on GitHub + LeetCode data",
+    "socialScore": "Score based on LinkedIn + Twitter data"
   }
 }
 
-GitHub Data: ${JSON.stringify(githubData, null, 2)}
-LeetCode Data: ${JSON.stringify(leetcodeData, null, 2)}
+Connected Platform Data:
+${githubData ? `GitHub Data: ${JSON.stringify(githubData, null, 2)}` : 'GitHub: Not connected'}
+${leetcodeData ? `LeetCode Data: ${JSON.stringify(leetcodeData, null, 2)}` : 'LeetCode: Not connected'}
+${linkedinData ? `LinkedIn Data: ${JSON.stringify(linkedinData, null, 2)}` : 'LinkedIn: Not connected'}
+${twitterData ? `Twitter Data: ${JSON.stringify(twitterData, null, 2)}` : 'Twitter: Not connected'}
 
-Analyze thoroughly and provide specific, actionable insights. Focus on concrete examples from the data.`;
+Analyze thoroughly and provide specific, actionable insights. Focus on concrete examples from the available platform data. Adjust recommendations based on which platforms are connected.`;
 
 		console.log('🤖 Calling Sarvam AI API...');
 
@@ -401,6 +437,14 @@ export async function forceRefreshPortfolioInsights(userId: string) {
 						freshData = await fetchLeetCodeData(platform.username);
 						console.log('✅ Fresh LeetCode data fetched successfully');
 						break;
+					case PlatformType.LINKEDIN:
+						freshData = await fetchLinkedInData(platform.username);
+						console.log('✅ Fresh LinkedIn data fetched successfully');
+						break;
+					case PlatformType.TWITTER:
+						freshData = await fetchTwitterData(platform.username);
+						console.log('✅ Fresh Twitter data fetched successfully');
+						break;
 					default:
 						console.log(`⚠️ Unknown platform type: ${platform.type}`);
 						continue;
@@ -440,16 +484,22 @@ export async function forceRefreshPortfolioInsights(userId: string) {
 		// Prepare fresh data for Sarvam AI
 		const githubData = refreshedPlatforms.find(p => p.type === PlatformType.GITHUB)?.data;
 		const leetcodeData = refreshedPlatforms.find(p => p.type === PlatformType.LEETCODE)?.data;
+		const linkedinData = refreshedPlatforms.find(p => p.type === PlatformType.LINKEDIN)?.data;
+		const twitterData = refreshedPlatforms.find(p => p.type === PlatformType.TWITTER)?.data;
 
 		console.log('🔍 Fresh platform data analysis:', {
 			hasGithubData: !!githubData,
 			hasLeetcodeData: !!leetcodeData,
+			hasLinkedinData: !!linkedinData,
+			hasTwitterData: !!twitterData,
 			githubDataKeys: githubData ? Object.keys(githubData as any) : [],
-			leetcodeDataKeys: leetcodeData ? Object.keys(leetcodeData as any) : []
+			leetcodeDataKeys: leetcodeData ? Object.keys(leetcodeData as any) : [],
+			linkedinDataKeys: linkedinData ? Object.keys(linkedinData as any) : [],
+			twitterDataKeys: twitterData ? Object.keys(twitterData as any) : []
 		});
 
 		const prompt = `
-You are an expert technical recruiter and software engineering career advisor. Analyze the following FRESH developer profile data and provide detailed insights in JSON format.
+You are an expert technical recruiter and software engineering career advisor. Analyze the following FRESH developer profile data from multiple platforms and provide detailed insights in JSON format.
 
 IMPORTANT: Respond ONLY with valid JSON, no additional text or explanations.
 
@@ -474,14 +524,24 @@ Expected JSON structure:
     "specializations": ["Areas of expertise like 'Data Structures', 'System Design', 'Web Development']"
   },
   "insights": {
-    "strengths": ["4-5 specific technical strengths with details"],
-    "improvements": ["3-4 constructive areas for growth"],
-    "recommendations": ["4-5 actionable career recommendations"],
-    "projectHighlights": ["2-3 notable projects or achievements"]
+    "code": {
+      "strengths": ["4-5 specific technical coding strengths with details"],
+      "improvements": ["3-4 constructive areas for coding growth"],
+      "recommendations": ["4-5 actionable coding recommendations"],
+      "projectHighlights": ["2-3 notable projects or achievements"]
+    },
+    "social": {
+      "strengths": ["3-4 social media and networking strengths"],
+      "improvements": ["3-4 areas for social media improvement"],
+      "recommendations": ["4-5 actionable social media recommendations"],
+      "highlights": ["2-3 notable social media achievements or content"]
+    }
   },
   "metrics": {
     "githubActivity": "Detailed analysis of GitHub activity including repos, commits, collaboration",
     "codingProficiency": "Analysis of LeetCode performance including problem-solving patterns",
+    "professionalPresence": "Analysis of LinkedIn professional networking and content",
+    "socialEngagement": "Analysis of Twitter engagement and tech community involvement",
     "overallScore": "Numerical score out of 100",
     "activityLevel": "High/Medium/Low based on recent activity",
     "collaborationScore": "Assessment of teamwork and open source contributions"
@@ -491,11 +551,19 @@ Expected JSON structure:
     "nextSteps": ["3-4 specific next career steps"],
     "roleRecommendations": ["3-4 suitable job roles"],
     "salaryRange": "Estimated salary range based on skills and experience"
+  },
+  "platformData": {
+    "connectedPlatforms": ["List of connected platforms"],
+    "codeScore": "Score based on GitHub + LeetCode data",
+    "socialScore": "Score based on LinkedIn + Twitter data"
   }
 }
 
-FRESH GitHub Data: ${JSON.stringify(githubData, null, 2)}
-FRESH LeetCode Data: ${JSON.stringify(leetcodeData, null, 2)}
+FRESH Connected Platform Data:
+${githubData ? `GitHub Data: ${JSON.stringify(githubData, null, 2)}` : 'GitHub: Not connected'}
+${leetcodeData ? `LeetCode Data: ${JSON.stringify(leetcodeData, null, 2)}` : 'LeetCode: Not connected'}
+${linkedinData ? `LinkedIn Data: ${JSON.stringify(linkedinData, null, 2)}` : 'LinkedIn: Not connected'}
+${twitterData ? `Twitter Data: ${JSON.stringify(twitterData, null, 2)}` : 'Twitter: Not connected'}
 
 Analyze thoroughly with focus on the most recent activity and provide specific, actionable insights based on the latest data.`;
 
@@ -603,6 +671,38 @@ Analyze thoroughly with focus on the most recent activity and provide specific, 
 		return insights;
 	} catch (error) {
 		console.error('❌ Error force refreshing portfolio insights:', error);
+		throw error;
+	}
+}
+
+export async function purchasePlatformCredits(platformType: PlatformType, creditsRequired: number) {
+	try {
+		const { userId } = await auth();
+		if (!userId) throw new Error('Unauthorized');
+
+		// Get user from database
+		const user = await prisma.user.findFirst({
+			where: { clerkId: userId }
+		});
+		if (!user) throw new Error('User not found');
+
+		// In a real app, you would:
+		// 1. Check user's current credit balance from database
+		// 2. Deduct credits from balance
+		// 3. Record the transaction
+		// 4. Unlock the platform for the user
+
+		// For now, we'll just simulate the process
+		console.log(`💳 User ${user.id} purchasing ${creditsRequired} credits for ${platformType}`);
+		
+		// Simulate credit deduction
+		return {
+			success: true,
+			message: `Successfully purchased ${creditsRequired} credits for ${platformType}`,
+			remainingCredits: 10 - creditsRequired // Mock remaining credits
+		};
+	} catch (error) {
+		console.error('❌ Error purchasing platform credits:', error);
 		throw error;
 	}
 } 
