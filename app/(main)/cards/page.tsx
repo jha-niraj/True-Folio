@@ -421,7 +421,7 @@ export default function CardsPage() {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 p-4 md:p-6">
+        <div className="min-h-screen bg-gradient-to-br from-teal-50 via-emerald-900 to-teal-50 dark:from-teal-650 dark:via-emerald-900 dark:to-teal-650 p-4 md:p-6">
             <div className="max-w-7xl mx-auto">
                 {/* Header */}
                 <motion.div
